@@ -1,0 +1,431 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED屏幕参数计算工具</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            /* 背景：多色渐变 + 纹理覆盖 */
+            background: linear-gradient(135deg, #1e3c72 0%, #2a0845 50%, #ff416c 100%); /* 左蓝中紫下粉 */
+            height: 100vh; 
+            /* 添加大理石纹理覆盖层 */
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPgogIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CiAgPGcgZmlsbD0ibm9uZSI+CgkgIDxwYXRoIGQ9Ik0tMTUuNSAyMDkuNWgxMzB2LTEzMkgtMTUuNXoiIHN0cm9rZT0iI2RkZCIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIwLjEiLz4KCSAgPHBhdGggZD0iTTE4NC41IDIwOS41aDEzMHYtMTMySDE4NC41eiIgc3Ryb2tlPSIjZGRkIiBzdHJva2Utd2lkdGg9IjIiIG9wYWNpdHk9IjAuMSIvPgogIDwvZz4KPC9zdmc+');
+            background-repeat: repeat;
+            background-size: 300px; /* 控制纹理密度 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            overflow: auto;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 1920px; /* 适配16:9最大宽度 */
+            height: 100vh; /* 固定为视口高度 */
+            max-height: 1080px; /* 限制最大高度 */
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 15px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.4), 0 0 40px rgba(106, 17, 203, 0.3);
+            overflow: hidden;
+            backdrop-filter: blur(10px);
+            display: flex;
+            flex-direction: column; /* 垂直布局 */
+        }
+
+        .header {
+            background: linear-gradient(90deg, #4b0082, #000080, #4b0082);
+            color: white;
+            padding: 20px;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+            flex-shrink: 0; /* 防止头部被压缩 */
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%), linear-gradient(45deg, rgba(255,255,255,0.1) 25%, transparent 25%, transparent 75%, rgba(255,255,255,0.1) 75%);
+            background-size: 40px 40px;
+            background-position: 0 0, 20px 20px;
+            z-index: 0;
+        }
+
+        .header h1, .header p {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 2.2em; /* 稍微减小字体 */
+            margin-bottom: 5px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+        }
+
+        .header p {
+            font-size: 0.9em; /* 稍微减小字体 */
+            opacity: 0.9;
+        }
+
+        .content-wrapper {
+            display: flex;
+            flex: 1; /* 占据剩余全部空间 */
+            flex-direction: column;
+            padding: 20px;
+            gap: 20px;
+        }
+
+        .input-section {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            flex-shrink: 0; /* 防止输入区被压缩 */
+        }
+
+         .input-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* 自适应网格 */
+            gap: 15px;
+        }
+
+        .form-group {
+            margin-bottom: 0; /* 因为grid布局，取消原有margin */
+        }
+
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #5a2d82;
+            font-weight: 600;
+            font-size: 1em;
+        }
+
+        input {
+            width: 100%;
+            padding: 12px 14px;
+            border: 2px solid #d0c0e8;
+            border-radius: 8px;
+            font-size: 15px; /* 稍微减小字体 */
+            background-color: rgba(255, 255, 255, 0.8);
+            color: #333;
+            box-shadow: inset 0 2px 8px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        input:focus {
+            outline: none;
+            border-color: #6a11cb;
+            box-shadow: 0 0 0 3px rgba(106, 17, 203, 0.2), inset 0 2px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .button-container {
+            margin-top: 15px;
+            text-align: center; /* 居中按钮 */
+        }
+
+        button {
+            width: 200px; /* 固定按钮宽度 */
+            padding: 14px;
+            background: linear-gradient(135deg, #6a11cb, #2575fc, #6a11cb);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 17px; /* 稍微减小字体 */
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 6px 15px rgba(106, 17, 203, 0.4);
+        }
+
+        button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(106, 17, 203, 0.6);
+        }
+
+        button:active {
+            transform: translateY(1px);
+        }
+
+        .output-section {
+            background: rgba(255, 255, 255, 0.7);
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.5);
+            flex: 1; /* 占据剩余空间 */
+            display: flex;
+            flex-direction: column;
+        }
+
+        .output-header {
+            margin-bottom: 15px;
+        }
+
+        .output-header h2 {
+            color: #333;
+            margin-bottom: 0;
+            border-bottom: 2px solid #6a11cb;
+            padding-bottom: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 1.4em;
+        }
+
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); /* 自适应结果网格 */
+            gap: 15px;
+            overflow-y: auto; /* 如果结果过多，允许滚动 */
+            flex: 1; /* 占据剩余空间 */
+            padding-right: 5px; /* 为滚动条留出空间 */
+        }
+
+        .result-item {
+            background: linear-gradient(135deg, #f5f7fa, #e4edf9);
+            padding: 15px;
+            border-radius: 8px;
+            border-left: 5px solid #2575fc;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.08);
+            transition: transform 0.2s ease;
+        }
+
+        .result-item:hover {
+             transform: scale(1.02);
+             box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+        }
+
+        .result-label {
+            font-size: 13px; /* 稍微减小字体 */
+            color: #666;
+            font-weight: 500;
+        }
+
+        .result-value {
+            font-size: 18px; /* 稍微减小字体 */
+            font-weight: bold;
+            color: #333;
+            margin-top: 4px;
+            word-break: break-all;
+        }
+
+        /* 响应式设计 */
+        @media (max-width: 1200px) {
+            .input-grid {
+                grid-template-columns: repeat(3, 1fr); /* 在较小屏幕上固定3列 */
+            }
+             .result-grid {
+                grid-template-columns: repeat(3, 1fr); /* 在较小屏幕上固定3列 */
+            }
+        }
+
+        @media (max-width: 768px) {
+            .input-grid {
+                grid-template-columns: repeat(2, 1fr); /* 在移动设备上固定2列 */
+            }
+             .result-grid {
+                grid-template-columns: repeat(2, 1fr); /* 在移动设备上固定2列 */
+            }
+            .header h1 {
+                font-size: 1.8em;
+            }
+            .header p {
+                font-size: 0.8em;
+            }
+            .container {
+                padding: 10px;
+            }
+            .content-wrapper {
+                padding: 15px;
+            }
+            .input-section, .output-section {
+                padding: 15px;
+            }
+        }
+        @media (max-width: 480px) {
+            .input-grid, .result-grid {
+                 grid-template-columns: 1fr; /* 在极小屏幕上变为单列 */
+            }
+             button {
+                width: 100%; /* 按钮占满宽度 */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>LED屏幕参数计算工具</h1>
+            <p>LED Screen Parameter Calculation Tool</p>
+        </div>
+        
+        <div class="content-wrapper">
+            <!-- 输入区域 -->
+            <div class="input-section">
+                <div class="input-grid">
+                    <div class="form-group">
+                        <label for="panelWidth">灯板宽度 (mm)</label>
+                        <input type="number" id="panelWidth" placeholder="例如: 160">
+                    </div>
+                    <div class="form-group">
+                        <label for="panelHeight">灯板高度 (mm)</label>
+                        <input type="number" id="panelHeight" placeholder="例如: 160">
+                    </div>
+                    <div class="form-group">
+                        <label for="panelWidthPx">灯板宽度点数</label>
+                        <input type="number" id="panelWidthPx" placeholder="例如: 64">
+                    </div>
+                    <div class="form-group">
+                        <label for="panelHeightPx">灯板高度点数</label>
+                        <input type="number" id="panelHeightPx" placeholder="例如: 64">
+                    </div>
+                    <div class="form-group">
+                        <label for="screenWidth">屏幕宽尺寸 (mm)</label>
+                        <input type="number" id="screenWidth" placeholder="例如: 8480">
+                    </div>
+                    <div class="form-group">
+                        <label for="screenHeight">屏幕高尺寸 (mm)</label>
+                        <input type="number" id="screenHeight" placeholder="例如: 960">
+                    </div>
+                    <div class="form-group">
+                        <label for="scan">扫数</label>
+                        <input type="number" id="scan" placeholder="例如: 16">
+                    </div>
+                </div>
+                <div class="button-container">
+                    <button onclick="calculate()">立即计算</button>
+                </div>
+            </div>
+
+            <!-- 输出区域 -->
+            <div class="output-section">
+                <div class="output-header">
+                    <h2>计算结果</h2>
+                </div>
+                <div class="result-grid">
+                    <div class="result-item">
+                        <div class="result-label">宽灯板数量</div>
+                        <div class="result-value" id="boardW">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">高灯板数量</div>
+                        <div class="result-value" id="boardH">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">灯板总数</div>
+                        <div class="result-value" id="totalBoard">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">屏幕宽点数 (px)</div>
+                        <div class="result-value" id="screenWpx">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">屏幕高点数 (px)</div>
+                        <div class="result-value" id="screenHpx">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">屏幕总点数</div>
+                        <div class="result-value" id="totalPx">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">单屏网线数量</div>
+                        <div class="result-value" id="netLine">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">平米模组个数</div>
+                        <div class="result-value" id="boardsPerM2">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">单张模组IC数量</div>
+                        <div class="result-value" id="icPerBoard">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">平米IC个数</div>
+                        <div class="result-value" id="icPerM2">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">整屏驱动IC总个数</div>
+                        <div class="result-value" id="totalIC">-</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function calculate() {
+            // 1. 获取输入值
+            const panelWidth = parseFloat(document.getElementById('panelWidth').value);
+            const panelHeight = parseFloat(document.getElementById('panelHeight').value);
+            const panelWidthPx = parseFloat(document.getElementById('panelWidthPx').value);
+            const panelHeightPx = parseFloat(document.getElementById('panelHeightPx').value);
+            const screenWidth = parseFloat(document.getElementById('screenWidth').value);
+            const screenHeight = parseFloat(document.getElementById('screenHeight').value);
+            const scan = parseFloat(document.getElementById('scan').value);
+
+            if (!panelWidth || !panelHeight || !panelWidthPx || !panelHeightPx || !screenWidth || !screenHeight || !scan) {
+                alert("请输入所有参数！");
+                return;
+            }
+
+            // 2. 核心计算逻辑
+            
+            // 宽/高灯板数量 (向上取整)
+            const boardW = Math.ceil(screenWidth / panelWidth);
+            const boardH = Math.ceil(screenHeight / panelHeight);
+            
+            // 灯板总数
+            const totalBoard = boardW * boardH;
+            
+            // 屏幕宽/高点数
+            const screenWpx = boardW * panelWidthPx;
+            const screenHpx = boardH * panelHeightPx;
+            
+            // 屏幕总点数 (根据Excel推导的公式: ceil(widthPx/16)*16*boardW*heightPx*boardH)
+            const totalPx = Math.ceil(panelWidthPx / 16) * 16 * boardW * panelHeightPx * boardH;
+            
+            // 单张模组IC数量 (根据新公式)
+            const icPerBoard = Math.ceil(panelWidthPx / 16) * Math.ceil(panelHeightPx / scan) * 3;
+            
+            // 单屏网线数量 (根据新公式)
+            const netLine = Math.ceil(totalPx / 650000);
+            
+            // 平米模组个数
+            const boardsPerM2 = 1000000 / (panelWidth * panelHeight);
+            
+            // 平米IC个数
+            const icPerM2 = boardsPerM2 * icPerBoard;
+            
+            // 整屏驱动IC总个数
+            const totalIC = icPerBoard * totalBoard;
+
+            // 3. 输出结果
+            document.getElementById('boardW').textContent = boardW;
+            document.getElementById('boardH').textContent = boardH;
+            document.getElementById('totalBoard').textContent = totalBoard;
+            document.getElementById('screenWpx').textContent = screenWpx.toLocaleString();
+            document.getElementById('screenHpx').textContent = screenHpx.toLocaleString();
+            document.getElementById('totalPx').textContent = totalPx.toLocaleString();
+            document.getElementById('netLine').textContent = netLine;
+            document.getElementById('boardsPerM2').textContent = boardsPerM2.toFixed();
+            document.getElementById('icPerBoard').textContent = icPerBoard;
+            document.getElementById('icPerM2').textContent = icPerM2.toFixed();
+            document.getElementById('totalIC').textContent = totalIC;
+        }
+    </script>
+</body>
+</html>
