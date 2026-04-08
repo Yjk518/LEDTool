@@ -17,7 +17,7 @@
             background: linear-gradient(135deg, #1e3c72 0%, #2a0845 50%, #ff416c 100%); /* 左蓝中紫下粉 */
             height: 100vh; 
             /* 添加大理石纹理覆盖层 */
-            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPgogIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CiAgPGcgZmlsbD0ibm9uZSI+CgkgIDxwYXRoIGQ9Ik0tMTUuNSAyMDkuNWgxMzB2LTEzMkgtMTUuNXoiIHN0cm9rZT0iI2RkZCIgc3Ryb2tlLXdpZHRoPSIyIiBvcGFjaXR5PSIwLjEiLz4KCSAgPHBhdGggZD0iTTE4NC41IDIwOS41aDEzMHYtMTMySDE4NC41eiIgc3Ryb2tlPSIjZGRkIiBzdHJva2Utd2lkdGg9IjIiIG9wYWNpdHk9IjAuMSIvPgogIDwvZz4KPC9zdmc+');
+            background-image: url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiPgogIDxyZWN0IHdpZHRoPSIxMDAlIiBoZWlnaHQ9IjEwMCUiIGZpbGw9IiNmZmYiIGZpbGwtb3BhY2l0eT0iMC4xIi8+CiAgPGcgZmlsbD0ibm9uZSI+CgkgIDxwYXRoIGQ9Ik0tMTUuNSAyMDkuNWgxMzB2LTEzMkgtMTUuNXoiIHN0cm9rZT0iI2RkZCIgc3Ryb2tkZS13aWR0aD0iMiIgb3BhY2l0eT0iMC4xIi8+CiAgPHBhdGggZD0iTTE4NC41IDIwOS41aDEzMHYtMTMySDE4NC41eiIgc3Ryb2tlPSIjZGRkIiBzdHJva2Utd2lkdGg9IjIiIG9wYWNpdHk9IjAuMSIvPgogIDwvZz4KPC9zdmc+');
             background-repeat: repeat;
             background-size: 300px; /* 控制纹理密度 */
             display: flex;
@@ -305,6 +305,14 @@
                         <label for="scan">扫数</label>
                         <input type="number" id="scan" placeholder="例如: 16">
                     </div>
+                    <div class="form-group">
+                        <label for="cabinetWidth">箱体宽度 (mm)</label>
+                        <input type="number" id="cabinetWidth" placeholder="例如: 500">
+                    </div>
+                    <div class="form-group">
+                        <label for="cabinetHeight">箱体高度 (mm)</label>
+                        <input type="number" id="cabinetHeight" placeholder="例如: 500">
+                    </div>
                 </div>
                 <div class="button-container">
                     <button onclick="calculate()">立即计算</button>
@@ -361,6 +369,18 @@
                         <div class="result-label">整屏驱动IC总个数</div>
                         <div class="result-value" id="totalIC">-</div>
                     </div>
+                    <div class="result-item">
+                        <div class="result-label">宽箱体数量</div>
+                        <div class="result-value" id="cabinetW">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">高箱体数量</div>
+                        <div class="result-value" id="cabinetH">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div class="result-label">箱体总数</div>
+                        <div class="result-value" id="totalCabinet">-</div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -376,9 +396,21 @@
             const screenWidth = parseFloat(document.getElementById('screenWidth').value);
             const screenHeight = parseFloat(document.getElementById('screenHeight').value);
             const scan = parseFloat(document.getElementById('scan').value);
+            // 新增：获取箱体尺寸
+            const cabinetWidth = parseFloat(document.getElementById('cabinetWidth').value);
+            const cabinetHeight = parseFloat(document.getElementById('cabinetHeight').value);
 
             if (!panelWidth || !panelHeight || !panelWidthPx || !panelHeightPx || !screenWidth || !screenHeight || !scan) {
-                alert("请输入所有参数！");
+                alert("请输入所有必要参数！");
+                return;
+            }
+
+            // 检查箱体参数是否为空，如果为空则设为屏幕尺寸以便计算
+            const effectiveCabinetWidth = cabinetWidth || screenWidth;
+            const effectiveCabinetHeight = cabinetHeight || screenHeight;
+
+            if(effectiveCabinetWidth <= 0 || effectiveCabinetHeight <= 0){
+                alert("箱体尺寸必须大于0！");
                 return;
             }
 
@@ -402,7 +434,7 @@
             const icPerBoard = Math.ceil(panelWidthPx / 16) * Math.ceil(panelHeightPx / scan) * 3;
             
             // 单屏网线数量 (根据新公式)
-            const netLine = Math.ceil(totalPx / 650000);
+            const netLine =Math.ceil( Math.ceil(totalPx/panelWidthPx/panelHeightPx/cabinetWidth*panelWidth/cabinetHeight*panelHeight)/Math.floor(650000/cabinetWidth*panelWidth/panelWidthPx/cabinetHeight*panelHeight/panelHeightPx))
             
             // 平米模组个数
             const boardsPerM2 = 1000000 / (panelWidth * panelHeight);
@@ -412,6 +444,11 @@
             
             // 整屏驱动IC总个数
             const totalIC = icPerBoard * totalBoard;
+
+            // 新增：计算箱体数量 (向上取整)
+            const cabinetW = Math.ceil(screenWidth / effectiveCabinetWidth);
+            const cabinetH = Math.ceil(screenHeight / effectiveCabinetHeight);
+            const totalCabinet = cabinetW * cabinetH;
 
             // 3. 输出结果
             document.getElementById('boardW').textContent = boardW;
@@ -425,6 +462,10 @@
             document.getElementById('icPerBoard').textContent = icPerBoard;
             document.getElementById('icPerM2').textContent = icPerM2.toFixed();
             document.getElementById('totalIC').textContent = totalIC;
+            // 新增：输出箱体数量
+            document.getElementById('cabinetW').textContent = cabinetW;
+            document.getElementById('cabinetH').textContent = cabinetH;
+            document.getElementById('totalCabinet').textContent = totalCabinet;
         }
     </script>
 </body>
