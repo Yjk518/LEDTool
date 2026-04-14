@@ -1,0 +1,2117 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LED屏幕参数计算工具 - 设备推荐完整版</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Microsoft YaHei', Arial, sans-serif;
+        }
+        
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 10px;
+            color: #333;
+            font-size: 14px; /* 基础字体大小 */
+        }
+        
+        .container {
+            max-width: 100%;
+            margin: 0 auto;
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+        }
+        
+        header {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            padding: 15px;
+            text-align: center;
+            color: white;
+        }
+        
+        h1 {
+            font-size: 1.5em;
+            margin-bottom: 5px;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .subtitle {
+            font-size: 1em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 15px;
+        }
+        
+        .input-section {
+            background: #f8f9fa;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            box-shadow: 0 3px 8px rgba(0, 0, 0, 0.05);
+        }
+        
+        .section-title {
+            font-size: 1.2em;
+            color: #2c3e50;
+            margin-bottom: 15px;
+            border-left: 3px solid #4facfe;
+            padding-left: 8px;
+        }
+        
+        .input-grid {
+            display: grid;
+            grid-template-columns: 1fr; /* 手机端单列布局 */
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        
+        .input-group {
+            margin-bottom: 10px;
+        }
+        
+        label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+            color: #2c3e50;
+            font-size: 0.9em;
+        }
+        
+        input {
+            width: 100%;
+            padding: 10px;
+            border: 2px solid #e9ecef;
+            border-radius: 6px;
+            font-size: 14px;
+            transition: border-color 0.3s;
+        }
+        
+        input:focus {
+            border-color: #4facfe;
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(79, 172, 254, 0.2);
+        }
+        
+        .calculate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            padding: 12px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 30px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 4px 10px rgba(102, 126, 234, 0.4);
+            margin-top: 8px;
+            width: 100%;
+        }
+        
+        .calculate-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(102, 126, 234, 0.6);
+        }
+        
+        .calculate-btn:active {
+            transform: translateY(0);
+        }
+        
+        .results-section {
+            background: white;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .result-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); /* 更适合手机的小单元格 */
+            gap: 10px;
+        }
+        
+        .result-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 6px;
+            text-align: center;
+            transition: transform 0.3s;
+            font-size: 0.85em;
+        }
+        
+        .result-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-value {
+            font-size: 1.2em;
+            font-weight: bold;
+            color: #667eea;
+            margin-top: 3px;
+        }
+        
+        /* 特殊样式用于点间距显示 */
+        .pitch-spacing-container {
+            display: flex;
+            gap: 5px;
+            flex-direction: column; /* 手机端垂直排列 */
+        }
+        
+        .pitch-half {
+            flex: 1;
+            text-align: center;
+            border-right: none;
+            border-bottom: 1px solid #ddd;
+            padding-bottom: 5px;
+        }
+        
+        .pitch-half:last-child {
+            border-bottom: none;
+        }
+        
+        /* 设备推荐区域样式 - 完整参数版 */
+        .recommendation-section {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 20px 15px;
+            border-radius: 8px;
+            margin-top: 20px;
+        }
+        
+        .recommendation-title {
+            font-size: 1.4em;
+            margin-bottom: 15px;
+            text-align: center;
+            text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2);
+        }
+        
+        .level-info {
+            background: rgba(255, 255, 255, 0.15);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            backdrop-filter: blur(10px);
+            font-size: 0.9em;
+        }
+        
+        .level-name {
+            font-size: 1.3em;
+            font-weight: bold;
+            color: #ffd700;
+            margin-bottom: 8px;
+        }
+        
+        .level-description {
+            font-size: 1em;
+            line-height: 1.4;
+            margin-bottom: 10px;
+        }
+        
+        .level-criteria {
+            font-size: 0.85em;
+            background: rgba(0, 0, 0, 0.2);
+            padding: 6px 10px;
+            border-radius: 6px;
+            margin-top: 8px;
+        }
+        
+        .device-category {
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            margin-bottom: 20px;
+            padding: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        
+        .category-title {
+            font-size: 1.2em;
+            font-weight: bold;
+            margin-bottom: 12px;
+            color: #ffd700;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.5);
+            padding-bottom: 8px;
+        }
+        
+        .device-table-container {
+            overflow-x: auto;
+            margin: 10px 0;
+            border-radius: 8px;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        .device-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 100%; /* 适应容器宽度 */
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        
+        .device-table th {
+            background: linear-gradient(135deg, #4facfe 0%, #00f2fe 100%);
+            color: white;
+            padding: 10px 8px;
+            text-align: left;
+            font-weight: bold;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+            font-size: 0.8em;
+        }
+        
+        .device-table td {
+            padding: 8px;
+            border-bottom: 1px solid #e9ecef;
+            color: #ff3859;
+            font-size: 0.8em;
+            vertical-align: top;
+            word-break: break-word; /* 关键：允许文字换行 */
+            overflow-wrap: break-word; /* 确保长单词也能换行 */
+        }
+        
+        .device-table tr:hover {
+            background: #f8f9fa;
+        }
+        
+        .device-table tr:nth-child(even) {
+            background: #f1f3f5;
+        }
+        
+        .device-name {
+            font-weight: bold;
+            color: #ff4262;
+            font-size: 0.9em;
+        }
+        
+        .param-label {
+            font-weight: 600;
+            color: #2c3e50;
+            min-width: 120px;
+            display: inline-block;
+            font-size: 0.85em;
+        }
+        
+        .param-value {
+            color: #495057;
+            font-weight: 500;
+            font-size: 0.85em;
+            word-break: break-word; /* 参数值也要能换行 */
+            overflow-wrap: break-word;
+        }
+        
+        .device-params {
+            display: grid;
+            grid-template-columns: 1fr; /* 手机端单列显示参数 */
+            gap: 8px;
+            padding: 10px;
+            background: #f8f9fa;
+            border-radius: 6px;
+            margin: 6px 0;
+        }
+        
+        .param-item {
+            display: flex;
+            flex-direction: column; /* 手机端垂直排列标签和值 */
+            gap: 3px;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 15px;
+            color: #ffd700;
+            font-size: 1em;
+        }
+        
+        .error {
+            background: #dc3545;
+            color: white;
+            padding: 12px;
+            border-radius: 6px;
+            margin: 8px 0;
+            text-align: center;
+            font-size: 0.9em;
+        }
+        
+        .export-btns {
+            display: flex;
+            flex-direction: column; /* 手机端垂直排列按钮 */
+            align-items: center;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        .export-btn {
+            padding: 8px 16px;
+            border: none;
+            border-radius: 20px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: all 0.3s;
+            width: 80%; /* 按钮占满容器 */
+        }
+        
+        .export-excel {
+            background: #28a745;
+            color: white;
+        }
+        
+        .export-print {
+            background: #17a2b8;
+            color: white;
+        }
+        
+        .export-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+        }
+        
+        /* 响应式设计：平板及以上设备 */
+        @media (min-width: 768px) {
+            body {
+                padding: 20px;
+                font-size: 16px;
+            }
+            
+            .input-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            .result-grid {
+                grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            }
+            
+            h1 {
+                font-size: 1.8em;
+            }
+            
+            .subtitle {
+                font-size: 1.1em;
+            }
+            
+            .content {
+                padding: 25px;
+            }
+            
+            .input-section {
+                padding: 20px;
+            }
+            
+            .export-btns {
+                flex-direction: row; /* 平板及以上水平排列 */
+                justify-content: center;
+            }
+            
+            .export-btn {
+                width: auto; /* 平板及以上按钮自动宽度 */
+            }
+        }
+        
+        /* 桌面端进一步优化 */
+        @media (min-width: 1024px) {
+            .container {
+                max-width: 1200px;
+            }
+            
+            .input-grid {
+                grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            }
+            
+            .result-grid {
+                grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            }
+            
+            h1 {
+                font-size: 2em;
+            }
+            
+            .section-title {
+                font-size: 1.4em;
+            }
+            
+            .device-params {
+                grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>LED屏幕参数计算工具</h1>
+            <div class="subtitle">LED Screen Parameter Calculation Tool</div>
+        </header>
+        
+        <div class="content">
+            <div class="input-section">
+                <h2 class="section-title">屏幕参数输入</h2>
+                <div class="input-grid">
+                    <div class="input-group">
+                        <label for="panelWidth">灯板宽度 (mm)</label>
+                        <input type="number" id="panelWidth" placeholder="请输入灯板宽度">
+                    </div>
+                    <div class="input-group">
+                        <label for="panelHeight">灯板高度 (mm)</label>
+                        <input type="number" id="panelHeight" placeholder="请输入灯板高度">
+                    </div>
+                    <div class="input-group">
+                        <label for="panelWidthPoints">灯板宽度点数</label>
+                        <input type="number" id="panelWidthPoints" placeholder="请输入灯板宽度点数">
+                    </div>
+                    <div class="input-group">
+                        <label for="panelHeightPoints">灯板高度点数</label>
+                        <input type="number" id="panelHeightPoints" placeholder="请输入灯板高度点数">
+                    </div>
+                    <div class="input-group">
+                        <label for="screenWidth">屏幕宽尺寸 (mm)</label>
+                        <input type="number" id="screenWidth" placeholder="请输入屏幕宽尺寸">
+                    </div>
+                    <div class="input-group">
+                        <label for="screenHeight">屏幕高尺寸 (mm)</label>
+                        <input type="number" id="screenHeight" placeholder="请输入屏幕高尺寸">
+                    </div>
+                    <div class="input-group">
+                        <label for="scan">扫数</label>
+                        <input type="number" id="scan" placeholder="请输入扫数">
+                    </div>
+                    <!-- 整合后的统一箱体参数输入（只有一个箱体宽度和一个箱体高度） -->
+                    <div class="input-group">
+                        <label for="cabinetWidth">箱体宽度 (mm)</label>
+                        <input type="number" id="cabinetWidth" placeholder="请输入箱体宽度">
+                    </div>
+                    <div class="input-group">
+                        <label for="cabinetHeight">箱体高度 (mm)</label>
+                        <input type="number" id="cabinetHeight" placeholder="请输入箱体高度">
+                    </div>
+                </div>
+                <button class="calculate-btn" onclick="calculate()">立即计算</button>
+            </div>
+            
+            <div class="results-section">
+                <h2 class="section-title">计算结果</h2>
+                <div class="result-grid">
+                    <div class="result-item">
+                        <div>宽灯板数量</div>
+                        <div class="result-value" id="widthPanelCount">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div>高灯板数量</div>
+                        <div class="result-value" id="heightPanelCount">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div>灯板总数</div>
+                        <div class="result-value" id="totalPanelCount">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div>屏幕宽点数 (px)</div>
+                        <div class="result-value" id="screenWidthPoints">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div>屏幕高点数 (px)</div>
+                        <div class="result-value" id="screenHeightPoints">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div>屏幕总点数</div>
+                        <div class="result-value" id="totalPoints">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div>单屏网线数量</div>
+                        <div class="result-value" id="networkCables">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div>平米模组个数</div>
+                        <div class="result-value" id="modulesPerSquare">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div>单张模组IC数量</div>
+                        <div class="result-value" id="icPerModule">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div>平米IC个数</div>
+                        <div class="result-value" id="icPerSquare">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div>整屏驱动IC总个数</div>
+                        <div class="result-value" id="totalICCount">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div>宽箱体数量</div>
+                        <div class="result-value" id="widthBoxCount">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div>高箱体数量</div>
+                        <div class="result-value" id="heightBoxCount">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div>箱体总数</div>
+                        <div class="result-value" id="totalBoxCount">-</div>
+                    </div>
+                    <div class="result-item">
+                        <div>点间距 (mm)</div>
+                        <div class="result-value" id="pitchSpacing">-</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="recommendation-section" id="recommendationSection" style="display: none;">
+                <h2 class="recommendation-title">智能设备推荐 - 完整参数版</h2>
+                <div class="level-info">
+                    <div class="level-name" id="levelName">1-2网口小屏</div>
+                    <div class="level-description" id="levelDescription">适用于小型屏幕，1-2个网口输出</div>
+                    <div class="level-criteria" id="levelCriteria">档位判断条件: 屏幕总点数 ≤ 1,300,000 且 单屏网线数量 ≤ 2</div>
+                </div>
+                
+                <div id="devicesContainer">
+                    <div class="loading">正在加载推荐设备的完整参数...</div>
+                </div>
+                
+                <div class="export-btns">
+                    <button class="export-btn export-excel" onclick="exportToExcel()">导出到Excel</button>
+                    <button class="export-btn export-print" onclick="printRecommendation()">打印推荐</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 设备推荐JSON数据（完整参数版）- 修复档位数据结构
+        const deviceRecommendations = {
+  "levels": {
+    "1-2网口": {
+      "name": "1-2网口小屏",
+      "description": "适用于小型屏幕，1-2个网口输出",
+      "criteria": "屏幕总点数 ≤ 1,300,000 且 单屏网线数量 ≤ 2",
+      "categories": {
+        "控制器": [
+          {
+            "型号": "TB10",
+            "带载能力": "65W",
+            "输出网口": "1路",
+            "极限宽高": "最宽：2048（超长屏极限宽8192) 最高：2048",
+            "视频硬解码": "支持4K解码",
+            "处理器性能": "2GB+32GB",
+            "操作系统": "安卓10",
+            "U盘扩容": "高达128G",
+            "同步模式(HDMI)": "×",
+            "HDMI输出": "×",
+            "远程断上电": "需外接多功能卡",
+            "音频输出": "√",
+            "GPS": "选配GPS天线",
+            "多屏同步播放": "NTP对时、GPS对时、Lora对时",
+            "5G模块(选配)": "×",
+            "4G模块(选配)": "√",
+            "Lora模块(选配)": "√",
+            "控制方式": "有线、WiFi Ap、USB",
+            "备份": "×",
+            "支持诺瓦云": "√",
+            "二次开发方式": "API、T-SDK",
+            "认证信息": "CQC、SRRC"
+          },
+          {
+            "型号": "TB10 Plus",
+            "带载能力": "65W",
+            "输出网口": "1路",
+            "极限宽高": "最宽：2048（超长屏极限宽8192) 最高：2048",
+            "视频硬解码": "支持4K解码",
+            "处理器性能": "2GB+32GB",
+            "操作系统": "安卓10",
+            "U盘扩容": "高达128G",
+            "同步模式(HDMI)": "×",
+            "HDMI输出": "×",
+            "远程断上电": "需外接多功能卡",
+            "音频输出": "√",
+            "GPS": "选配GPS天线",
+            "多屏同步播放": "NTP对时、GPS对时、Lora对时",
+            "5G模块(选配)": "×",
+            "4G模块(选配)": "√",
+            "Lora模块(选配)": "√",
+            "控制方式": "有线、WiFi Ap、USB",
+            "备份": "×",
+            "支持诺瓦云": "√",
+            "二次开发方式": "API、T-SDK",
+            "认证信息": "CE、ROHS、FCC、IC"
+          },
+          {
+            "型号": "TB20",
+            "带载能力": "65W",
+            "输出网口": "1路",
+            "极限宽高": "最宽：2048（超长屏极限宽8192) 最高：2048",
+            "视频硬解码": "支持4K解码",
+            "处理器性能": "2GB+32GB",
+            "操作系统": "安卓10",
+            "U盘扩容": "高达128G",
+            "同步模式(HDMI)": "√",
+            "HDMI输出": "×",
+            "远程断上电": "需外接多功能卡",
+            "音频输出": "√",
+            "GPS": "选配GPS天线",
+            "多屏同步播放": "NTP对时、GPS对时、Lora对时",
+            "5G模块(选配)": "×",
+            "4G模块(选配)": "√",
+            "Lora模块(选配)": "√",
+            "控制方式": "有线、WiFi Ap、USB",
+            "备份": "×",
+            "支持诺瓦云": "√",
+            "二次开发方式": "API、T-SDK",
+            "认证信息": "CQC、SRRC"
+          },
+          {
+            "型号": "TB20 Plus",
+            "带载能力": "65W",
+            "输出网口": "1路",
+            "极限宽高": "最宽：2048（超长屏极限宽8192) 最高：2048",
+            "视频硬解码": "支持4K解码",
+            "处理器性能": "2GB+32GB",
+            "操作系统": "安卓10",
+            "U盘扩容": "高达128G",
+            "同步模式(HDMI)": "√",
+            "HDMI输出": "×",
+            "远程断上电": "需外接多功能卡",
+            "音频输出": "√",
+            "GPS": "选配GPS天线",
+            "多屏同步播放": "NTP对时、GPS对时、Lora对时",
+            "5G模块(选配)": "×",
+            "4G模块(选配)": "√",
+            "Lora模块(选配)": "√",
+            "控制方式": "有线、WiFi Ap、USB",
+            "备份": "×",
+            "支持诺瓦云": "√",
+            "二次开发方式": "API、T-SDK",
+            "认证信息": "CE、ROHS、FCC、IC"
+          },
+          {
+            "型号": "TB30",
+            "带载能力": "65W",
+            "输出网口": "2路，1主1备",
+            "极限宽高": "最宽：4096（超长屏极限宽23040) 最高：4096",
+            "视频硬解码": "支持4K解码",
+            "处理器性能": "1GB+32GB",
+            "操作系统": "安卓11",
+            "U盘扩容": "高达128G",
+            "同步模式(HDMI)": "×",
+            "HDMI输出": "×",
+            "远程断上电": "需外接多功能卡",
+            "音频输出": "√",
+            "GPS": "选配GPS天线",
+            "多屏同步播放": "NTP对时、GPS对时、Lora对时",
+            "5G模块(选配)": "支持",
+            "4G模块(选配)": "√",
+            "Lora模块(选配)": "√",
+            "控制方式": "有线、WiFi Ap、USB",
+            "备份": "√",
+            "支持诺瓦云": "√",
+            "二次开发方式": "API、T-SDK",
+            "认证信息": "CE、UL、MIC、FCC、IC、PSE、UKCA等，更多认证信息详见规格书"
+          },
+          {
+            "型号": "TB40",
+            "带载能力": "130W",
+            "输出网口": "2路 (2主)",
+            "极限宽高": "最宽：4096（超长屏极限宽23040) 最高：4096",
+            "视频硬解码": "支持4K解码",
+            "处理器性能": "1GB+32GB",
+            "操作系统": "安卓11",
+            "U盘扩容": "高达128G",
+            "同步模式(HDMI)": "√",
+            "HDMI输出": "√",
+            "远程断上电": "需外接多功能卡",
+            "音频输出": "√",
+            "GPS": "选配GPS天线",
+            "多屏同步播放": "NTP对时、GPS对时、Lora对时",
+            "5G模块(选配)": "支持",
+            "4G模块(选配)": "√",
+            "Lora模块(选配)": "√",
+            "控制方式": "有线、WiFi Ap、USB",
+            "备份": "√（带载减半）",
+            "支持诺瓦云": "√",
+            "二次开发方式": "API、T-SDK",
+            "认证信息": "/"
+          },
+          {
+            "型号": "TB50",
+            "带载能力": "130W",
+            "输出网口": "2路 (2主)",
+            "极限宽高": "最宽：4096（超长屏极限宽23040) 最高：4096",
+            "视频硬解码": "支持4K解码",
+            "处理器性能": "1GB+32GB",
+            "操作系统": "安卓11",
+            "U盘扩容": "高达128G",
+            "同步模式(HDMI)": "√",
+            "HDMI输出": "√",
+            "远程断上电": "需外接多功能卡",
+            "音频输出": "√",
+            "GPS": "选配GPS天线",
+            "多屏同步播放": "NTP对时、GPS对时、Lora对时",
+            "5G模块(选配)": "支持",
+            "4G模块(选配)": "√",
+            "Lora模块(选配)": "√",
+            "控制方式": "有线、WiFi Ap、USB",
+            "备份": "√（带载减半）",
+            "支持诺瓦云": "√",
+            "二次开发方式": "API、T-SDK",
+            "认证信息": "CE、UL、MIC、FCC、IC、PSE、UKCA等，更多认证信息详见规格书"
+          }
+        ],
+        "二合一控制器": [
+          {
+            "型号": "V760",
+            "类型": "二合一控制器",
+            "带载能力": "130万",
+            "宽高极限": "最宽：3840 最高：1920",
+            "输入接口": "DVI×1；HDMI×1；VGA×1；CVBS×11；USB×1",
+            "输出接口": "网口×2",
+            "独立音频输入输出": "支持",
+            "输出监视": "/",
+            "图层数量": "1",
+            "场景数量": "6",
+            "其他功能": "U盘播放",
+            "中控对接": "RS232",
+            "通用功能": "亮度调节、输入截取、一键缩放、测试画面、快捷键"
+          }
+        ],
+        "传统控制器": [
+          {
+            "产品名称": "MCTRL300",
+            "带载能力": "130万",
+            "视频源位深": "8bit",
+            "视频输入": "DVI×1",
+            "音频输入": "3.5mm音频口×1",
+            "控制接口": "USB×1",
+            "输出接口": "网口×2",
+            "光探头": "光探头接口×1",
+            "支持硬件点屏": "×",
+            "支持局域网调试": "×",
+            "硬件调节亮色度": "×",
+            "低延时": "×",
+            "3D功能": "×",
+            "任意角度旋转": "×",
+            "画面镜像翻转": "×",
+            "GENLOCK": "×",
+            "HDR功能": "×",
+            "光电转换模式": "×",
+            "同步拼接器模式": "×"
+          }
+        ]
+      }
+    },
+    "4-6网口": {
+      "name": "4-6网口中屏",
+      "description": "适用于中型屏幕，4-6个网口输出",
+      "criteria": "屏幕总点数 ≤ 3,900,000 且 单屏网线数量 ≤ 6",
+      "categories": {
+        "传统控制器": [
+          {
+            "产品名称": "MCTRL600",
+            "带载能力": "230万",
+            "视频源位深": "8/10/12bit",
+            "视频输入": "DVI×1\nHDMI×1",
+            "音频输入": "3.5mm音频口×1\nHDMI音频",
+            "控制接口": "USB×1",
+            "输出接口": "网口×4",
+            "光探头": "光探头接口×1",
+            "支持硬件点屏": "×",
+            "支持局域网调试": "×",
+            "硬件调节亮色度": "×",
+            "低延时": "×",
+            "3D功能": "×",
+            "任意角度旋转": "×",
+            "画面镜像翻转": "×",
+            "GENLOCK": "×",
+            "HDR功能": "×",
+            "光电转换模式": "×",
+            "同步拼接器模式": "×"
+          },
+          {
+            "产品名称": "MCTRL660",
+            "带载能力": "230万",
+            "视频源位深": "8/10/12bit",
+            "视频输入": "HDMI/DVI×1\nHDMI LOOP×1\nDVI LOOP×1",
+            "音频输入": "3.5mm音频口×1\nHDMI音频",
+            "控制接口": "USB×1",
+            "输出接口": "网口×4",
+            "光探头": "无",
+            "支持硬件点屏": "√",
+            "支持局域网调试": "×",
+            "硬件调节亮色度": "√",
+            "低延时": "×",
+            "3D功能": "×",
+            "任意角度旋转": "×",
+            "画面镜像翻转": "×",
+            "GENLOCK": "×",
+            "HDR功能": "×",
+            "光电转换模式": "×",
+            "同步拼接器模式": "×"
+          },
+          {
+            "产品名称": "MCTRL660 Pro",
+            "带载能力": "230万",
+            "视频源位深": "8/10/12bit",
+            "视频输入": "DVI IN×1，DVI LOOP×1\nHDMI IN×1，HDMI LOOP×1\n3G-SDI IN×1",
+            "音频输入": "HDMI音频",
+            "控制接口": "1路ETHERNET\n1路USB IN\n1路USB OUT",
+            "输出接口": "6路RJ45千兆网口\n2路光纤口（单模双芯)",
+            "光探头": "无",
+            "支持硬件点屏": "√",
+            "支持局域网调试": "√",
+            "硬件调节亮色度": "√",
+            "低延时": "√",
+            "3D功能": "×",
+            "任意角度旋转": "×",
+            "画面镜像翻转": "√",
+            "GENLOCK": "√",
+            "HDR功能": "×",
+            "光电转换模式": "√",
+            "同步拼接器模式": "×"
+          },
+          {
+            "产品名称": "MCTRL700",
+            "带载能力": "230万",
+            "视频源位深": "8bit",
+            "视频输入": "DVI×1，DVI OUT×1\nHDMI×1\nHDMI OUT×1",
+            "音频输入": "3.5mm音频口×1",
+            "控制接口": "USB×1\nRJ45 IN\nRJ45 OUT",
+            "输出接口": "网口×6",
+            "光探头": "无",
+            "支持硬件点屏": "×",
+            "支持局域网调试": "×",
+            "硬件调节亮色度": "×",
+            "低延时": "×",
+            "3D功能": "×",
+            "任意角度旋转": "×",
+            "画面镜像翻转": "×",
+            "GENLOCK": "×",
+            "HDR功能": "×",
+            "光电转换模式": "×",
+            "同步拼接器模式": "×"
+          },
+          {
+            "产品名称": "MCTRL700Pro",
+            "带载能力": "230万",
+            "视频源位深": "8bit",
+            "视频输入": "DVI IN×1，DVI LOOP×1\nHDMI IN×1\nHDMI LOOP×1",
+            "音频输入": "3.5mm音频口×1",
+            "控制接口": "2路ETHERNET",
+            "输出接口": "网口×6",
+            "光探头": "√",
+            "支持硬件点屏": "×",
+            "支持局域网调试": "√",
+            "硬件调节亮色度": "×",
+            "低延时": "√",
+            "3D功能": "×",
+            "任意角度旋转": "×",
+            "画面镜像翻转": "×",
+            "GENLOCK": "×",
+            "HDR功能": "×",
+            "光电转换模式": "×",
+            "同步拼接器模式": "×"
+          }
+        ],
+        "控制器": [
+          {
+            "产品名称": "TB60",
+            "带载能力": "230W",
+            "输出网口": "4路 (4主)",
+            "极限宽高": "最宽：4096（超长屏极限宽23040) 最高：4096",
+            "视频硬解码": "支持4K解码",
+            "处理器性能": "1GB+32GB",
+            "操作系统": "安卓11",
+            "U盘扩容": "高达128G",
+            "同步模式(HDMI)": "√",
+            "HDMI输出": "√",
+            "远程断上电": "需外接多功能卡",
+            "音频输出": "√",
+            "GPS": "选配GPS天线",
+            "多屏同步播放": "NTP对时、GPS对时、Lora对时",
+            "5G模块(选配)": "支持",
+            "4G模块(选配)": "√",
+            "Lora模块(选配)": "√",
+            "控制方式": "有线、WiFi Ap、USB",
+            "备份": "√（带载减半）",
+            "支持诺瓦云": "√",
+            "二次开发方式": "API、T-SDK",
+            "认证信息": "CE、UL、MIC、FCC、IC、PSE、UKCA等，更多认证信息详见规格书"
+          },
+          {
+            "产品名称": "MBOX600 Pro",
+            "带载能力": "260W",
+            "输出网口": "4路 (4主)",
+            "极限宽高": "最宽：4096 最高：1920",
+            "视频硬解码": "/",
+            "处理器性能": "英特尔处理器N97，最高睿频3.6GHz\n4GB/8GB 运行内存、128GB/256GB磁盘容量",
+            "操作系统": "Linux/Windows10/Windows11",
+            "U盘扩容": "高达256G",
+            "同步模式(HDMI)": "√",
+            "HDMI输出": "√",
+            "远程断上电": "×",
+            "音频输出": "√",
+            "GPS": "选配GPS天线",
+            "多屏同步播放": "NTP对时、GPS对时、Lora对时",
+            "5G模块(选配)": "×",
+            "4G模块(选配)": "√",
+            "Lora模块(选配)": "/",
+            "控制方式": "有线",
+            "备份": "√（带载减半）",
+            "支持诺瓦云": "√",
+            "二次开发方式": "/",
+            "认证信息": "CE、FCC、IC、UL等，更多认证信息详见规格书"
+          },
+          {
+            "产品名称": "TU15",
+            "带载能力": "260万像素",
+            "极限宽高": "最宽4096；最高1920",
+            "Android系统": "Android 11",
+            "Wi-Fi": "Wi-Fi5（AP），Wi-Fi5（Station）",
+            "内存空间": "2GB/32GB",
+            "输入接口": "2×HDMI 1.3；3×USB 2.0",
+            "输出接口": "1×HDMI 1.3；4×RJ45（1Gps)、1×3.5mm音频接口",
+            "控制接口": "1x千兆网口、\n1xRS232串口(对接中控设备)、\n1x传感器接口(连接亮度传感器或温湿度传感器)",
+            "智能播控": "遥控器插控;屏精灵三端插控;U盘插控",
+            "HDR": "不支持",
+            "无线投屏": "支持TYPE-C接口/USB接口投屏器；支持Windows、iOS、Android多系统多平台终端投屏",
+            "白板书写": "预装APP可试用（正式版需单独采购激活码）",
+            "智能语音控制": "支持",
+            "自由缩放": "支持一键缩放、自定义缩放",
+            "画质增强": "不支持",
+            "效果调节": "支持标准，鲜艳，会议，人像4种模式切换",
+            "一键护眼": "支持",
+            "Launcher自定义": "支持",
+            "开机动画自定义": "支持"
+          },
+          {
+            "产品名称": "TU15 Pro",
+            "带载能力": "260万像素",
+            "极限宽高": "最宽4096；最高1920",
+            "Android系统": "Android 11",
+            "Wi-Fi": "Wi-Fi6（AP），Wi-Fi5（Station）",
+            "内存空间": "4GB/32GB",
+            "输入 interfaces": "2×HDMI 1.3；3×USB 2.0",
+            "输出接口": "1×HDMI 1.3；4×RJ45（1Gps)、1×3.5mm音频接口",
+            "控制接口": "1x千兆网口、\n1xRS232串口(对接中控设备)、\n1x传感器接口(连接亮度传感器或温湿度传感器)",
+            "智能播控": "遥控器插控;屏精灵三端插控;U盘插控",
+            "HDR": "不支持",
+            "无线投屏": "支持TYPE-C接口/USB接口投屏器；支持Windows、iOS、Android多系统多平台终端投屏",
+            "白板书写": "预装APP可试用（正式版需单独采购激活码）",
+            "智能语音控制": "支持",
+            "自由缩放": "支持一键缩放、自定义缩放",
+            "画质增强": "支持",
+            "效果调节": "支持标准，鲜艳，会议，人像4种模式切换",
+            "一键护眼": "支持",
+            "Launcher自定义": "支持",
+            "开动机画自定义": "支持"
+          },
+          {
+            "产品名称": "TU20",
+            "带载能力": "390万像素",
+            "极限宽高": "最宽4096；最高1920",
+            "Android系统": "Android 11",
+            "Wi-Fi": "Wi-Fi5（AP），Wi-Fi5（Station）",
+            "内存空间": "2GB/32GB",
+            "输入接口": "2×HDMI 1.3；3×USB 2.0",
+            "输出接口": "1×HDMI 1.3；6×RJ45（1Gps)、1×3.5mm音频接口",
+            "控制接口": "1x千兆网口、\n1xRS232串口(对接中控设备)、\n1x传感器接口(连接亮度传感器或温湿度传感器)",
+            "智能播控": "遥控器插控;屏精灵三端插控;U盘插控",
+            "HDR": "不支持",
+            "无线投屏": "支持TYPE-C接口/USB接口投屏器；支持Windows、iOS、Android多系统多平台终端投屏",
+            "白板书写": "预装APP可试用（正式版需单独采购激活码）",
+            "智能语音控制": "支持",
+            "自由缩放": "支持一键缩放、自定义缩放",
+            "画质增强": "不支持",
+            "效果调节": "支持标准，鲜艳，会议，人像4种模式切换",
+            "一键护眼": "支持",
+            "Launcher自定义": "支持",
+            "开动机画自定义": "支持"
+          },
+          {
+            "产品名称": "TU20 Pro",
+            "带载能力": "390万像素",
+            "极限宽高": "最宽4096；最高1920",
+            "Android系统": "Android 11",
+            "Wi-Fi": "Wi-Fi6（AP），Wi-Fi5（Station）",
+            "内存空间": "4GB/32GB",
+            "输入接口": "2×HDMI 1.3；3×USB 2.0",
+            "输出接口": "1×HDMI 1.3；6×RJ45（1Gps)、1×3.5mm音频接口",
+            "控制接口": "1x千兆网口、\n1xRS232串口(对接中控设备)、\n1x传感器接口(连接亮度传感器或温湿度传感器)",
+            "智能播控": "遥控器插控;屏精灵三端插控;U盘插控",
+            "HDR": "不支持",
+            "无线投屏": "支持TYPE-C接口/USB接口投屏器；支持Windows、iOS、Android多系统多平台终端投屏",
+            "白板书写": "预装APP可试用（正式版需单独采购激活码）",
+            "智能语音控制": "支持",
+            "自由缩放": "支持一键缩放、自定义缩放",
+            "画质增强": "支持",
+            "效果调节": "支持标准，鲜艳，会议，人像4种模式切换",
+            "一键护眼": "支持",
+            "Launcher自定义": "支持",
+            "开动机画自定义": "支持"
+          }
+        ],
+        "二合一控制器": [
+          {
+            "型号": "V960",
+            "类型": "二合一控制器",
+            "带载能力": "260万",
+            "宽高极限": "最宽：3840 最高：1920",
+            "输入接口": "DVI×1；HDMI×1；VGA×1；CVBS×1；USB×1",
+            "输出接口": "网口×4",
+            "独立音频输入输出": "支持",
+            "输出监视": "/",
+            "图层数量": "1",
+            "场景数量": "6",
+            "其他功能": "U盘播放",
+            "中控对接": "RS232",
+            "通用功能": "亮度调节、输入截取、一键缩放、测试画面、快捷键"
+          },
+          {
+            "型号": "VX400 Pro",
+            "带载能力": "260万",
+            "宽高极限": "最宽10240;最高8192",
+            "输入接口": "1xHDMI 2.0 (IN+LOOP)、\n2xHDMI1.3\n1x3G-SDI(IN+IOOP)\n1x10G光口(OPT1)、\n1xUSB 3.0",
+            "输出接口": "网x4、\n10G光口x2",
+            "独立音频输入输出": "支持",
+            "输出监视": "2K",
+            "设备模式": "1.视频控制器模式;\n2.光电转换器模式;\n3.ByPass模式",
+            "图层数量2K": "6",
+            "场景数量": "256",
+            "U盘播放": "支持",
+            "任意走线": "支持",
+            "全链路备份": "支持",
+            "低延迟": "支持",
+            "HDR": "不支持",
+            "3D": "支持",
+            "MOSAIC": "不支持",
+            "输入源拼接": "不支持",
+            "光探头接口": "支持",
+            "控制方式": "USB，TCP/IP",
+            "中控对接": "RS232，TCP/IP",
+            "智能控制": "可视化智控平台，微信小程序",
+            "软件控制": "LCT，Unico，Unico Web",
+            "液晶支持语言": "简体中文、繁体中文、英语、印地语、西班牙语、法语、葡萄牙语、俄语、日语、韩语、德语、越南语、土耳其语、泰语、印尼语"
+          },
+          {
+            "型号": "VX600 Pro",
+            "带载能力": "390万",
+            "宽高极限": "最宽10240;最高8192",
+            "输入接口": "1xHDMI 2.0 (IN+LOOP)、\n2xHDMI1.3、\n1x3G-SDI(IN+LOOP)、\n1x10G 光口 (OPT1)、\n1xUSB 3.0、\n1xGenlock (IN+LOOP)",
+            "输出接口": "网x6、\n10G光口x2",
+            "独立音频输入输出": "支持",
+            "输出监视": "2K",
+            "设备模式": "1.视频控制器模式;\n2.光电转换器模式;\n3.ByPass模式",
+            "图层数量2K": "6",
+            "场景数量": "256",
+            "U盘播放": "支持",
+            "任意走线": "支持",
+            "全链路备份": "支持",
+            "低延迟": "支持",
+            "HDR": "不支持",
+            "3D": "支持",
+            "MOSAIC": "不支持",
+            "输入源拼接": "不支持",
+            "光探头接口": "支持",
+            "控制方式": "USB，TCP/IP",
+            "中控对接": "RS232，TCP/IP",
+            "智能控制": "可视化智控平台，微信小程序",
+            "软件控制": "LCT，Unico，Unico Web",
+            "液晶支持语言": "简体中文、繁体中文、英语、印地语、西班牙语、法语、葡萄牙语、俄语、日语、韩语、德语、越南语、土耳其语、泰语、印尼语"
+          },
+          {
+            "型号": "V6",
+            "类型": "",
+            "带载能力": "390万",
+            "宽高极限": "最宽：10240 最高：8192",
+            "输入接口": "1xHDMI 2.0(IN+LOOP）\n2XHDMI 1.3\n1X3G-SDI (IN+LOOP选配)\n1xUSB 3.0(插放U盘内的图片或视频)",
+            "输出接口": "网口x6\n10G光口x1",
+            "独立音频输入输出": "支持",
+            "全链路备份": "输入备份、设备备份\n网口备份、光网备份",
+            "输出监视": "HDMI 1.3",
+            "设备模式": "视频控制器模式\n光电转换器模式",
+            "图层数量2K": "6",
+            "场景数量": "256",
+            "U盘播放": "支持",
+            "任意走线": "支持",
+            "OSD字幕(文字、图片、时钟、天气)": "支持",
+            "遥控控制": "支持",
+            "3D": "支持",
+            "HDR": "/",
+            "控制方式": "USB，TCP/IP",
+            "中控对接": "RS232，TCP/IP",
+            "智能控制": "可视化智控平台﹐微信小程序",
+            "软件控制": "LCT，Unico，Unico Web"
+          }
+        ]
+      }
+    },
+    "8-12网口": {
+      "name": "8-12网口大屏",
+      "description": "适用于大型屏幕，8-12个网口输出",
+      "criteria": "屏幕总点数 ≤ 7,800,000 且 单屏网线数量 ≤ 12",
+      "categories": {
+        "二合一控制器": [
+          {
+            "型号": "V8",
+            "类型": "",
+            "带载能力": "520万",
+            "宽高极限": "最宽:10240 最高:8192",
+            "输入接口": "1xHDMI 2.0 (IN+LOOP）\n2xHDMI 1.3\n1x3G-SDI (IN+LOOP选配)\n1xUSB3.0 (插放U盘内的图片或视频)",
+            "输出接口": "网口x8\n10G光口x1",
+            "独立音频输入输出": "支持",
+            "全链路备份": "输入备份、设备备份\n网口备份、光网备份",
+            "输出监视": "HDMI 1.3",
+            "设备模式": "视频控制器模式光电转换器模式",
+            "图层数量2K": "6",
+            "场景数量": "256",
+            "U盘播放": "支持",
+            "任意走线": "支持",
+            "OSD字幕(文字、图片、时钟、天气)": "支持",
+            "遥控控制": "支持",
+            "3D": "支持",
+            "HDR": "/",
+            "控制方式": "USB，TCP/IP",
+            "中控对接": "RS232，TCP/IP",
+            "智能控制": "可视化智控平台﹐微信小程序",
+            "软件控制": "LCT，Unico，Unico Web"
+          },
+          {
+            "型号": "V10",
+            "类型": "",
+            "带载能力": "650万",
+            "宽高极限": "最宽:10240 最高:8192",
+            "输入接口": "1xHDMI 2.0 (IN+LOOP）\n2xHDMI1.3\n1x3G-SDI (IN+LOOP选配）\n1xUSB3.0(插放U盘内的图片或视频)",
+            "输出接口": "网口x10\n10G光口x1",
+            "独立音频输入输出": "支持",
+            "全链路备份": "输入备份、设备备份\n网口备份、光网备份",
+            "输出监视": "HDMI 1.3",
+            "设备模式": "视频控制器模式光电转换器模式",
+            "图层数量2K": "6",
+            "场景数量": "256",
+            "U盘播放": "支持",
+            "任意走线": "支持",
+            "OSD字幕(文字、图片、时钟、天气)": "支持",
+            "遥控控制": "支持",
+            "3D": "支持",
+            "HDR": "/",
+            "控制方式": "USB，TCP/IP",
+            "中控对接": "RS232，TCP/IP",
+            "智能控制": "可视化智控平台﹐微信小程序",
+            "软件控制": "LCT，Unico，Unico Web"
+          },
+          {
+            "型号": "V12",
+            "类型": "",
+            "带载能力": "780万",
+            "宽高极限": "最宽:10240 最高:8192",
+            "输入接口": "1xHDMI 2.0 (IN+LOOP）\n2xHDMI1.3\n1x3G-SDI (IN+LOOP选配）\n1xUSB3.0(插放U盘内的图片或视频)",
+            "输出接口": "网口x12\n10G光口x2",
+            "独立音频输入输出": "支持",
+            "全链路备份": "输入备份、设备备份\n网口备份、光网备份",
+            "输出监视": "HDMI 1.3",
+            "设备模式": "视频控制器模式光电转换器模式",
+            "图层数量2K": "6",
+            "场景数量": "256",
+            "U盘播放": "支持",
+            "任意走线": "支持",
+            "OSD字幕(文字、图片、时钟、天气)": "支持",
+            "遥控控制": "支持",
+            "3D": "支持",
+            "HDR": "/",
+            "控制方式": "USB，TCP/IP",
+            "中控对接": "RS232，TCP/IP",
+            "智能控制": "可视化智控平台﹐微信小程序",
+            "软件控制": "LCT，Unico，Unico Web"
+          },
+          {
+            "型号": "VX1000 Pro",
+            "带载能力": "650万",
+            "宽高极限": "最宽10240;最高8192",
+            "输入接口": "1XHDMI 2.0 (IN+LOOP)、\n2HDMI1.3、\n1x3G-SDI(IN+LOOP)、\n1x10G光口(OPT1)、\n1xUSB 3.0、\n1xGenlock (IN+L00P)",
+            "输出接口": "网x10、\n10G光口x2",
+            "独立音频输入输出": "支持",
+            "输出监视": "2K",
+            "设备模式": "1.视频控制器模式;\n2.光电转换器模式;\n3.ByPass模式",
+            "图层数量2K": "6",
+            "场景数量": "256",
+            "U盘播放": "支持",
+            "任意走线": "支持",
+            "全链路备份": "支持",
+            "低延迟": "支持",
+            "HDR": "不支持",
+            "3D": "支持",
+            "MOSAIC": "不支持",
+            "输入源拼接": "不支持",
+            "光探头接口": "支持",
+            "控制方式": "USB，TCP/IP",
+            "中控对接": "RS232，TCP/IP",
+            "智能控制": "可视化智控平台，微信小程序",
+            "软件控制": "LCT，Unico，Unico Web",
+            "液晶支持语言": "简体中文、繁体中文、英语、印地语、西班牙语、法语、葡萄牙语、俄语、日语、韩语、德语、越南语、土耳其语、泰语、印尼语"
+          }
+        ]
+      }
+    },
+    "16-20网口": {
+      "name": "16-20网口超大屏",
+      "description": "适用于超大型屏幕，16-20个网口输出",
+      "criteria": "屏幕总点数 ≤ 13,000,000 且 单屏网线数量 ≤ 20",
+      "categories": {
+        "传统控制器": [
+          {
+            "产品名称": "MCTRL 1600",
+            "带载能力": "920万",
+            "视频源位深": "8/10/12bit",
+            "视频输入": "DP1.2×1\nDVI×4",
+            "音频输入": "HDMI音频",
+            "控制接口": "1路ETHERNET\n1路USB IN\n1路USB OUT\nRS232 IN, RS232 OUT",
+            "输出接口": "16路千兆网口\n4路光纤口（单模双芯)",
+            "光探头": "无",
+            "支持硬件点屏": "√",
+            "支持局域网调试": "√",
+            "硬件调节亮色度": "√",
+            "低延时": "×",
+            "3D功能": "√",
+            "任意角度旋转": "×",
+            "画面镜像翻转": "×",
+            "GENLOCK": "×",
+            "HDR功能": "×",
+            "光电转换模式": "√",
+            "同步拼接器模式": "√"
+          },
+          {
+            "产品名称": "MCTRL 4K",
+            "带载能力": "880万",
+            "视频源位深": "8/10/12bit",
+            "视频输入": "DP1.2×1\nHDMI 2.0×1\nDual DVI×2",
+            "音频输入": "HDMI音频",
+            "控制接口": "USB×1\n网口×1",
+            "输出接口": "网口×16\n四路光纤",
+            "光探头": "无",
+            "支持硬件点屏": "√",
+            "支持局域网调试": "√",
+            "硬件调节亮色度": "√",
+            "低延时": "√",
+            "3D功能": "×",
+            "任意角度旋转": "×",
+            "画面镜像翻转": "√",
+            "GENLOCK": "×",
+            "HDR功能": "√",
+            "光电转换模式": "×",
+            "同步拼接器模式": "√"
+          },
+          {
+            "产品名称": "MCTRL 2000",
+            "带载能力": "920万",
+            "视频源位深": "8/10/12bit",
+            "视频输入": "DP1.2×1\nHDMI 2.0×1\nS-DVI×4",
+            "音频输入": "3.5mm音频口×1\nHDMI音频",
+            "控制接口": "1路ETHERNET\n1路USB IN\n1路USB OUT",
+            "输出接口": "20路千兆网口\n4路光纤口（单模双芯)\n3.5mm音频口×1",
+            "光探头": "无",
+            "支持硬件点屏": "√",
+            "支持局域网调试": "√",
+            "硬件调节亮色度": "√",
+            "低延时": "×",
+            "3D功能": "√",
+            "任意角度旋转": "×",
+            "画面镜像翻转": "√",
+            "GENLOCK": "×",
+            "HDR功能": "×",
+            "光电转换模式": "√",
+            "同步拼接器模式": "√"
+          }
+        ],
+        "二合一控制器": [
+          {
+            "型号": "VX16s",
+            "类型": "二合一控制器",
+            "带载能力": "1040万",
+            "宽高极限": "最宽:16384 最高:8192",
+            "输入接口": "HDMI 2.0x1\nDVIx4、\n3G-SDIx2",
+            "输出接口": "HDMIx1(监视)\n网口x16",
+            "独立音频输入输出": "\\",
+            "输出监视": "\\",
+            "设备模式": "\\",
+            "图层数量2K": "3",
+            "场景数量": "\\",
+            "U盘播放": "不支持",
+            "任意走线": "\\",
+            "全链路备份": "\\",
+            "低延迟": "\\",
+            "HDR": "\\",
+            "3D": "\\",
+            "MOSAIC": "\\",
+            "输入源拼接": "\\",
+            "光探头接口": "\\",
+            "控制方式": "\\",
+            "中控对接": "\\",
+            "智能控制": "\\",
+            "软件控制": "\\",
+            "液晶支持语言": "\\"
+          },
+          {
+            "型号": "NovaPro UHD Jr",
+            "类型": "二合一控制器",
+            "带载能力": "1040万",
+            "宽高极限": "最宽:16384 最高:8192",
+            "输入 interfaces": "DP1.2x1、\nDVIx4、\nHDMI 2.0x1、\n12G-SDIx2",
+            "输出接口": "HDMIx1(监视)\nHDMI 2.0 LOOPx1、\n12G-SDILOOPx2、\nNeutrik网口x16",
+            "独立音频输入输出": "不支持",
+            "输出监视": "2K",
+            "设备模式": "1.视频控制器模式;\n2.光电转换器模式;",
+            "图层数量2K": "3+1xOSD",
+            "场景数量": "10",
+            "U盘播放": "不支持",
+            "任意走线": "支持",
+            "全链路备份": "\\",
+            "低延迟": "\\",
+            "HDR": "\\",
+            "3D": "\\",
+            "MOSAIC": "\\",
+            "输入源拼接": "\\",
+            "光探头接口": "\\",
+            "控制方式": "\\",
+            "中控对接": "\\",
+            "智能控制": "\\",
+            "软件控制": "LCT，\nV-Can",
+            "液晶支持语言": "\\"
+          },
+          {
+            "型号": "VX2000 Pro",
+            "带载能力": "1300万",
+            "宽高极限": "最宽16384;最高8192",
+            "输入接口": "1xDP 1.2、\n2xHDMI 2.0、\n4xHDMI1.3、\n1x12G-SDI (IN+LOOP)、\n2x10G光口(OPT1/2)、\n1xUSB 3.0、\n1xGenlock (IN+L00P)",
+            "输出接口": "网x20、\n10G光口x4",
+            "独立音频输入输出": "支持",
+            "输出监视": "流畅模式2K;高清模式4K",
+            "设备模式": "1.视频控制器模式;\n2.光电转换器模式;\n3.ByPass模式",
+            "图层数量2K": "12",
+            "场景数量": "256",
+            "U盘播放": "支持",
+            "任意走线": "支持",
+            "全链路备份": "支持",
+            "低延迟": "支持",
+            "HDR": "支持",
+            "3D": "支持",
+            "MOSAIC": "支持",
+            "输入源拼接": "支持",
+            "光探头接口": "支持",
+            "控制方式": "USB，TCP/IP",
+            "中控对接": "RS232，TCP/IP",
+            "智能控制": "可视化智控平台，微信小程序",
+            "软件控制": "LCT，Unico，Unico Web",
+            "液晶支持语言": "简体中文、繁体中文、英语、印地语、西班牙语、法语、葡萄牙语、俄语、日语、韩语、德语、越南语、土耳其语、泰语、印尼语"
+          },
+          {
+            "型号": "V16",
+            "类型": "",
+            "带载能力": "1040万",
+            "宽高极限": "最宽:16384\n最高:8192",
+            "输入接口": "1xHDMI 2.0 1xDP 1.2\n4xHDMI 1.3\n1x3G-SDI (IN+LOOP选配)\n1xUSB3.0 (插放U盘内的图片或视频)",
+            "输出接口": "网口x16\n10G光口x2\n3D接口",
+            "独立音频输入输出": "支持",
+            "全链路备份": "输入备份、设备备份\n网口备份、光网备份",
+            "输出监视": "HDMI 1.3",
+            "设备模式": "视频控制器模式光电转换器模式",
+            "图层数量2K": "12",
+            "场景数量": "256",
+            "U盘播放": "支持",
+            "任意走线": "支持",
+            "OSD字幕(文字、图片、时钟、天气)": "支持",
+            "遥控控制": "支持",
+            "3D": "支持",
+            "HDR": "支持",
+            "控制方式": "USB，TCP/IP",
+            "中控对接": "RS232，TCP/IP",
+            "智能控制": "可视化智控平台﹐微信小程序",
+            "软件控制": "LCT，Unico，Unico Web"
+          },
+          {
+            "产品名称": "TU4K",
+            "带载能力": "1300万像素",
+            "极限宽高": "最宽16384；最高8192",
+            "Android系统": "Android 13",
+            "Wi-Fi": "Wi-Fi5（AP），Wi-Fi5（Station）",
+            "内存空间": "4GB/128GB",
+            "输入接口": "2×HDMI 2.0 IN；1×HDMI 1.3 IN\n1×USB 3.0；1×USB 2.0",
+            "输出接口": "1×HDMI1.3；20×RJ45（1Gps)\n2×光口；1×3.5mm音频输出\n1×SPDIF 音频输出",
+            "控制接口": "1×千兆网口\n1×RS232串口（对接中控设备）\n2×传感器接口（连接亮度传感器或温湿度传感器）",
+            "智能播控": "遥控器播控；屏精灵三端播控；U盘播控；同异步同时上屏",
+            "HDR": "不支持",
+            "无线投屏": "支持TYPE-C接口/USB接口投屏器；支持Windows、iOS、Android多系统多平台终端投屏",
+            "白板书写": "预装APP可试用（正式版需单独采购激活码）",
+            "智能语音控制": "支持",
+            "自由缩放": "支持一键缩放、自定义缩放",
+            "画质增强": "不支持",
+            "效果调节": "支持标准，鲜艳，会议，人像4种模式切换",
+            "一键护眼": "支持",
+            "Launcher自定义": "支持",
+            "开动机画自定义": "支持"
+          },
+          {
+            "产品名称": "TU4KPro",
+            "带载能力": "1300万像素",
+            "极限宽高": "最宽16384；最高8192",
+            "Android系统": "Android 13",
+            "Wi-Fi": "Wi-Fi6（AP），Wi-Fi5（Station）",
+            "内存空间": "8GB/128GB",
+            "输入接口": "2×HDMI 2.0 IN；1×HDMI 1.3 IN\n1×USB 3.0；1×USB 2.0",
+            "输出接口": "1×HDMI1.3；20×RJ45（1Gps)\n2×光口；1×3.5mm音频输出\n1×SPDIF 音频输出",
+            "控制接口": "1×千兆网口\n1×RS232串口（对接中控设备）\n2×传感器接口（连接亮度传感器或温湿度传感器）",
+            "智能播控": "遥控器播控；屏精灵三端播控；U盘播控；同异步同时上屏",
+            "HDR": "支持",
+            "无线投屏": "支持TYPE-C接口/USB接口投屏器；支持Windows、iOS、Android多系统多平台终端投屏",
+            "白板书写": "预装APP可试用（正式版需单独采购激活码）",
+            "智能语音控制": "支持",
+            "自由缩放": "支持一键缩放、自定义缩放",
+            "画质增强": "支持",
+            "效果调节": "支持标准，鲜艳，会议，人像4种模式切换",
+            "一键护眼": "支持",
+            "Launcher自定义": "支持",
+            "开动机画自定义": "支持"
+          }
+        ]
+      }
+    },
+    "24网口": {
+      "name": "24网口巨幕",
+      "description": "适用于巨型屏幕，24个网口输出",
+      "criteria": "屏幕总点数 ≤ 15,600,000 且 单屏网线数量 ≤ 24",
+      "categories": {
+        "二合一控制器": [
+          {
+            "型号": "V24",
+            "类型": "",
+            "带载能力": "1560万",
+            "宽高极限": "最宽:16384 最高:8192",
+            "输入接口": "1xDP 1.2&1xHDMI2.0二选一\n2xHDMI 2.0\n4xHDMI 1.3\n1x3G-SDI (IN+LOOP选配）\n1xUSB3.0(插放U盘内的图片或视频)",
+            "输出接口": "网口x24、\n10G光口x4、\n3D接口",
+            "独立音频输入输出": "支持",
+            "全链路备份": "输入备份、设备备份\n网口备份、光网备份",
+            "输出监视": "HDMI 1.3",
+            "设备模式": "视频控制器模式光电转换器模式",
+            "图层数量2K": "12",
+            "场景数量": "256",
+            "U盘播放": "支持",
+            "任意走线": "支持",
+            "OSD字幕(文字、图片、时钟、天气)": "支持",
+            "遥控控制": "支持",
+            "3D": "支持",
+            "HDR": "支持",
+            "控制方式": "USB，TCP/IP",
+            "中控对接": "RS232，TCP/IP",
+            "智能控制": "可视化智控平台﹐微信小程序",
+            "软件控制": "LCT，Unico，Unico Web"
+          }
+        ]
+      }
+    },
+    "32网口": {
+      "name": "32网口巨型屏",
+      "description": "适用于特大型屏幕，32个网口输出",
+      "criteria": "屏幕总点数 ≤ 20,800,000 且 单屏网线数量 ≤ 32",
+      "categories": {
+        "二合一控制器": [
+          {
+            "型号": "V32",
+            "类型": "",
+            "带载能力": "2080万",
+            "宽高极限": "最宽:16384 最高:8192",
+            "输入接口": "1xDP 1.2&1xHDMI2.0\n二选一\n2xHDMI 2.0\n4xHDMI 1.3\n1x3G-SDI (IN+LOOP选配）\n1xUSB3.0(插放U盘内的图片或视频",
+            "输出接口": "网口x32、\n10G光口x4、\n3D接口",
+            "独立音频输入输出": "支持",
+            "全链路备份": "输入备份、设备备份\n网口备份、光网备份",
+            "输出监视": "HDMI 1.3",
+            "设备模式": "视频控制器模式光电转换器模式",
+            "图层数量2K": "12",
+            "场景数量": "256",
+            "U盘播放": "支持",
+            "任意走线": "支持",
+            "OSD字幕(文字、图片、时钟、天气)": "支持",
+            "遥控控制": "支持",
+            "3D": "支持",
+            "HDR": "支持",
+            "控制方式": "USB，TCP/IP",
+            "中控对接": "RS232，TCP/IP",
+            "智能控制": "可视化智控平台﹐微信小程序",
+            "软件控制": "LCT，Unico，Unico Web"
+          }
+        ]
+      }
+    },
+    "40网口": {
+      "name": "40网口超巨型屏",
+      "description": "适用于超大型屏幕，40个网口输出",
+      "criteria": "屏幕总点数 ≤ 26,000,000 且 单屏网线数量 ≤ 40",
+      "categories": {
+        "二合一控制器": [
+          {
+            "型号": "V40",
+            "类型": "",
+            "带载能力": "2600万",
+            "宽高极限": "最宽:16384 最高:8192",
+            "输入接口": "1xDP 1.2&1xHDMI 2.0\n二选一\n2xHDMI2.0\n4xHDMI1.3\n1x3G-SDI (IN+LOOP选配）\n1xUSB3.0(插放U盘内的图片或视频）",
+            "输出接口": "网口x40、\n10G光口x4、\n3D接口",
+            "独立音频输入输出": "支持",
+            "全链路备份": "输入备份、设备备份\n网口备份、光网备份",
+            "输出监视": "HDMI 1.3",
+            "设备模式": "视频控制器模式光电转换器模式",
+            "图层数量2K": "12",
+            "场景数量": "256",
+            "U盘播放": "支持",
+            "任意走线": "支持",
+            "OSD字幕(文字、图片、时钟、天气)": "支持",
+            "遥控控制": "支持",
+            "3D": "支持",
+            "HDR": "支持",
+            "控制方式": "USB，TCP/IP",
+            "中控对接": "RS232，TCP/IP",
+            "智能控制": "可视化智控平台﹐微信小程序",
+            "软件控制": "LCT，Unico，Unico Web"
+          }
+        ],
+        "视频处理器": [
+          {
+            "型号": "H2",
+            "输入最大的路数": "16",
+            "输出最大路数(视频输出卡)": "8",
+            "输出最大LED带载点数(网口输出卡)": "2600万(40个网口)",
+            "输出最大LED带载点数(4光口输出卡对接光电转换器）": "5200万(80个网口)",
+            "单卡双4K输入": "支持",
+            "音频（伴随输入+独立音频）": "支持",
+            "权限管理": "支持",
+            "IPC解码（ONVIF RTSP GB28181）": "支持",
+            "输入源备份": "支持",
+            "设备备份": "支持",
+            "图层数量2K": "每张输出板卡16图层",
+            "预监/回显支持(需选配预监卡)": "支持",
+            "HDR、3D": "支持",
+            "电源备份": "不支持",
+            "新功能": "1、新增H_2路DP1.2输入卡；2、新增H_4路光口发送卡（增强版）；3、新增H_1路DP1.4+1路HDMI2.1输入卡；4、新增H_4路光口输入卡；\n5、新增多屏管理、预监轮巡、预监画质提升等功能；6、双4K输入子卡全系机箱适配；\n7、触控液晶新增：锁屏/熄屏/屏幕控制/屏幕列表/屏幕亮度调节/场景切换/3D左右眼切换/OSD开关/控制指令功能；8、硬件亮度定时调节；9、HDBaset/NDI/OPT/ST2110视频信号远传；",
+            "可选输入子卡": "H_2路DP1.2输入卡、H_1路DP1.4+1路HDMI 2.1输入卡、H_4路光口输入卡、H_4路 DVI输入卡、H_4路 HDMI输入卡、H_1路HDMI 2.0+1路DP1.2输入卡、\nH_1 路 HDMI 2.0 输入卡、H_1 路 DP1.2 输入卡、H_2 路 HDMI 2.0 输入卡H_2 路 HDMI 2.0 +2路DP1.2输入卡、H_2 路网口IP解码卡、H_4 路3G-SDI输入卡、H_1路12G-SDI输入卡、\nH_2路CVBS+2路 VGA 输入卡、H_2 路 DP1.1 输入卡、H_4 路VGA输入卡 、H_标准中控子卡、H_4路HDBaseT输入卡（HDBaseT×4)、H_1路NDI 输入卡、H_1路ST2110输入卡、\nH_2路光口输入卡、H_2×Audio 输入+2×Audio输出卡（音频输入×2、音频输出×2）",
+            "可选输出子卡": "H_4路 DVI输出卡、H_4路 HDMI输出卡、H_4路3G-SDI输出卡、H_1路12G-SDI输出卡、H_1路HDMI 2.0输出卡、\nH_4路HDBaseT输出卡（HDBaseT×4)、H_16路网口+2路光口发送卡、H_4路光口发送卡\nH_4路光口发送卡（增强版﹚、H_20路网口发送卡、H_2路网口+1路HDMI 1.3预监卡"
+          }
+        ]
+      }
+    },
+    "60网口": {
+      "name": "60网口特巨型屏",
+      "description": "适用于特大型屏幕，60个网口输出",
+      "criteria": "屏幕总点数 ≤ 39,000,000 且 单屏网线数量 ≤ 60",
+      "categories": {
+        "视频处理器": [
+          {
+            "型号": "H5",
+            "输入最大的路数": "40",
+            "输出最大路数(视频输出卡)": "12",
+            "输出最大LED带载点数(网口输出卡)": "3900万(60个网口)",
+            "输出最大LED带载点数(4光口输出卡对接光电转换器）": "7800万(120个网口)",
+            "单卡双4K输入": "支持",
+            "音频（伴随输入+独立音频）": "支持",
+            "权限管理": "支持",
+            "IPC解码（ONVIF RTSP GB28181）": "支持",
+            "输入源备份": "支持",
+            "设备备份": "支持",
+            "图层数量2K": "每张输出板卡16图层",
+            "预监/回显支持(需选配预监卡)": "支持",
+            "HDR、3D": "支持",
+            "电源备份": "1+1",
+            "新功能": "1、新增H_2路DP1.2输入卡；2、新增H_4路光口发送卡（增强版）；3、新增H_1路DP1.4+1路HDMI2.1输入卡；4、新增H_4路光口输入卡；\n5、新增多屏管理、预监轮巡、预监画质提升等功能；6、双4K输入子卡全系机箱适配；\n7、触控液晶新增：锁屏/熄屏/屏幕控制/屏幕列表/屏幕亮度调节/场景切换/3D左右眼切换/OSD开关/控制指令功能；8、硬件亮度定时调节；9、HDBaset/NDI/OPT/ST2110视频信号远传；",
+            "可选输入子卡": "H_2路DP1.2输入卡、H_1路DP1.4+1路HDMI 2.1输入卡、H_4路光口输入卡、H_4路 DVI输入卡、H_4路 HDMI输入卡、H_1路HDMI 2.0+1路DP1.2输入卡、\nH_1 路 HDMI 2.0 输入卡、H_1 路 DP1.2 输入卡、H_2 路 HDMI 2.0 输入卡H_2 路 HDMI 2.0 +2路DP1.2输入卡、H_2 路网口IP解码卡、H_4 路3G-SDI输入卡、H_1路12G-SDI输入卡、\nH_2路CVBS+2路 VGA 输入卡、H_2 路 DP1.1 输入卡、H_4 路VGA输入卡 、H_标准中控子卡、H_4路HDBaseT输入卡（HDBaseT×4)、H_1路NDI 输入卡、H_1路ST2110输入卡、\nH_2路光口输入卡、H_2×Audio 输入+2×Audio输出卡（音频输入×2、音频输出×2）",
+            "可选输出子卡": "H_4路 DVI输出卡、H_4路 HDMI输出卡、H_4路3G-SDI输出卡、H_1路12G-SDI输出卡、H_1路HDMI 2.0输出卡、\nH_4路HDBaseT输出卡（HDBaseT×4)、H_16路网口+2路光口发送卡、H_4路光口发送卡\nH_4路光口发送卡（增强版﹚、H_20路网口发送卡、H_2路网口+1路HDMI 1.3预监卡"
+          }
+        ]
+      }
+    },
+    "100网口": {
+      "name": "100网口极限屏",
+      "description": "适用于极限大型屏幕，100个网口输出",
+      "criteria": "屏幕总点数 ≤ 65,000,000 且 单屏网线数量 ≤ 100",
+      "categories": {
+        "视频处理器": [
+          {
+            "型号": "H9",
+            "输入最大的路数": "60",
+            "输出最大路数(视频输出卡)": "20",
+            "输出最大LED带载点数(网口输出卡)": "6500万(100个网口)",
+            "输出最大LED带载点数(4光口输出卡对接光电转换器）": "1.3亿（200个网口）",
+            "单卡双4K输入": "支持",
+            "音频（伴随输入+独立音频）": "支持",
+            "权限管理": "支持",
+            "IPC解码（ONVIF RTSP GB28181）": "支持",
+            "输入源备份": "支持",
+            "设备备份": "支持",
+            "图层数量2K": "每张输出板卡16图层",
+            "预监/回显支持(需选配预监卡)": "支持",
+            "HDR、3D": "支持",
+            "电源备份": "1+1",
+            "新功能": "1、新增H_2路DP1.2输入卡；2、新增H_4路光口发送卡（增强版）；3、新增H_1路DP1.4+1路HDMI2.1输入卡；4、新增H_4路光口输入卡；\n5、新增多屏管理、预监轮巡、预监画质提升等功能；6、双4K输入子卡全系机箱适配；\n7、触控液晶新增：锁屏/熄屏/屏幕控制/屏幕列表/屏幕亮度调节/场景切换/3D左右眼切换/OSD开关/控制指令功能；8、硬件亮度定时调节；9、HDBaset/NDI/OPT/ST2110视频信号远传；",
+            "可选输入子卡": "H_2路DP1.2输入卡、H_1路DP1.4+1路HDMI 2.1输入卡、H_4路光口输入卡、H_4路 DVI输入卡、H_4路 HDMI输入卡、H_1路HDMI 2.0+1路DP1.2输入卡、\nH_1 路 HDMI 2.0 输入卡、H_1 路 DP1.2 输入卡、H_2 路 HDMI 2.0 输入卡H_2 路 HDMI 2.0 +2路DP1.2输入卡、H_2 路网口IP解码卡、H_4 路3G-SDI输入卡、H_1路12G-SDI输入卡、\nH_2路CVBS+2路 VGA 输入卡、H_2 路 DP1.1 输入卡、H_4 路VGA输入卡 、H_标准中控子卡、H_4路HDBaseT输入卡（HDBaseT×4)、H_1路NDI 输入卡、H_1路ST2110输入卡、\nH_2路光口输入卡、H_2×Audio 输入+2×Audio输出卡（音频输入×2、音频输出×2）",
+            "可选输出子卡": "H_4路 DVI输出卡、H_4路 HDMI输出卡、H_4路3G-SDI输出卡、H_1路12G-SDI输出卡、H_1路HDMI 2.0输出卡、\nH_4路HDBaseT输出卡（HDBaseT×4)、H_16路网口+2路光口发送卡、H_4路光口发送卡\nH_4路光口发送卡（增强版﹚、H_20路网口发送卡、H_2路网口+1路HDMI 1.3预监卡"
+          },
+          {
+            "型号": "H9增强版",
+            "输入最大的路数": "60",
+            "输出最大路数(视频输出卡)": "40",
+            "输出最大LED带载点数(网口输出卡)": "6500万(100个网口)",
+            "输出最大LED带载点数(4光口输出卡对接光电转换器）": "2.6亿（400个网口）",
+            "单卡双4K输入": "支持",
+            "音频（伴随输入+独立音频）": "支持",
+            "权限管理": "支持",
+            "IPC解码（ONVIF RTSP GB28181）": "支持",
+            "输入源备份": "支持",
+            "设备备份": "支持",
+            "图层数量2K": "每张输出板卡16图层",
+            "预监/回显支持(需选配预监卡)": "支持",
+            "HDR、3D": "支持",
+            "电源备份": "1+1",
+            "新功能": "1、新增H_2路DP1.2输入卡；2、新增H_4路光口发送卡（增强版）；3、新增H_1路DP1.4+1路HDMI2.1输入卡；4、新增H_4路光口输入卡；\n5、新增多屏管理、预监轮巡、预监画质提升等功能；6、双4K输入子卡全系机箱适配；\n7、触控液晶新增：锁屏/熄屏/屏幕控制/屏幕列表/屏幕亮度调节/场景切换/3D左右眼切换/OSD开关/控制指令功能；8、硬件亮度定时调节；9、HDBaset/NDI/OPT/ST2110视频信号远传；",
+            "可选输入子卡": "H_2路DP1.2输入卡、H_1路DP1.4+1路HDMI 2.1输入卡、H_4路光口输入卡、H_4路 DVI输入卡、H_4路 HDMI输入卡、H_1路HDMI 2.0+1路DP1.2输入卡、\nH_1 路 HDMI 2.0 输入卡、H_1 路 DP1.2 输入卡、H_2 路 HDMI 2.0 输入卡H_2 路 HDMI 2.0 +2路DP1.2输入卡、H_2 路网口IP解码卡、H_4 路3G-SDI输入卡、H_1路12G-SDI输入卡、\nH_2路CVBS+2路 VGA 输入卡、H_2 路 DP1.1 输入卡、H_4 路VGA输入卡 、H_标准中控子卡、H_4路HDBaseT输入卡（HDBaseT×4)、H_1路NDI 输入卡、H_1路ST2110输入卡、\nH_2路光口输入卡、H_2×Audio 输入+2×Audio输出卡（音频输入×2、音频输出×2）",
+            "可选输出子卡": "H_4路 DVI输出卡、H_4路 HDMI输出卡、H_4路3G-SDI输出卡、H_1路12G-SDI输出卡、H_1路HDMI 2.0输出卡、\nH_4路HDBaseT输出卡（HDBaseT×4)、H_16路网口+2路光口发送卡、H_4路光口发送卡\nH_4路光口发送卡（增强版﹚、H_20路网口发送卡、H_2路网口+1路HDMI 1.3预监卡"
+          }
+        ]
+      }
+    },
+    "200网口": {
+      "name": "200网口超极限屏",
+      "description": "适用于超极限大型屏幕，200个网口输出",
+      "criteria": "屏幕总点数 ≤ 130,000,000 且 单屏网线数量 ≤ 200",
+      "categories": {
+        "视频处理器": [
+          {
+            "型号": "H15",
+            "输入最大的路数": "120",
+            "输出最大路数(视频输出卡)": "40",
+            "输出最大LED带载点数(网口输出卡)": "1.3亿(200个网口)",
+            "输出最大LED带载点数(4光口输出卡对接光电转换器）": "2.6亿（400个网口）",
+            "单卡双4K输入": "支持",
+            "音频（伴随输入+独立音频）": "支持",
+            "权限管理": "支持",
+            "IPC解码（ONVIF RTSP GB28181）": "支持",
+            "输入源备份": "支持",
+            "设备备份": "支持",
+            "图层数量2K": "每张输出板卡16图层",
+            "预监/回显支持(需选配预监卡)": "支持",
+            "HDR、3D": "支持",
+            "电源备份": "2+2",
+            "新功能": "1、新增H_2路DP1.2输入卡；2、新增H_4路光口发送卡（增强版）；3、新增H_1路DP1.4+1路HDMI2.1输入卡；4、新增H_4路光口输入卡；\n5、新增多屏管理、预监轮巡、预监画质提升等功能；6、双4K输入子卡全系机箱适配；\n7、触控液晶新增：锁屏/熄屏/屏幕控制/屏幕列表/屏幕亮度调节/场景切换/3D左右眼切换/OSD开关/控制指令功能；8、硬件亮度定时调节；9、HDBaset/NDI/OPT/ST2110视频信号远传；",
+            "可选输入子卡": "H_2路DP1.2输入卡、H_1路DP1.4+1路HDMI 2.1输入卡、H_4路光口输入卡、H_4路 DVI输入卡、H_4路 HDMI输入卡、H_1路HDMI 2.0+1路DP1.2输入卡、\nH_1 路 HDMI 2.0 输入卡、H_1 路 DP1.2 输入卡、H_2 路 HDMI 2.0 输入卡H_2 路 HDMI 2.0 +2路DP1.2输入卡、H_2 路网口IP解码卡、H_4 路3G-SDI输入卡、H_1路12G-SDI输入卡、\nH_2路CVBS+2路 VGA 输入卡、H_2 路 DP1.1 输入卡、H_4 路VGA输入卡 、H_标准中控子卡、H_4路HDBaseT输入卡（HDBaseT×4)、H_1路NDI 输入卡、H_1路ST2110输入卡、\nH_2路光口输入卡、H_2×Audio 输入+2×Audio输出卡（音频输入×2、音频输出×2）",
+            "可选输出子卡": "H_4路 DVI输出卡、H_4路 HDMI输出卡、H_4路3G-SDI输出卡、H_1路12G-SDI输出卡、H_1路HDMI 2.0输出卡、\nH_4路HDBaseT输出卡（HDBaseT×4)、H_16路网口+2路光口发送卡、H_4路光口发送卡\nH_4路光口发送卡（增强版﹚、H_20路网口发送卡、H_2路网口+1路HDMI 1.3预监卡"
+          },
+          {
+            "型号": "H15增强版",
+            "输入最大的路数": "120",
+            "输出最大路数(视频输出卡)": "64",
+            "输出最大LED带载点数(网口输出卡)": "2.08亿(320个网口)",
+            "输出最大LED带载点数(4光口输出卡对接光电转换器）": "4.16亿（640个网口）",
+            "单卡双4K输入": "支持",
+            "音频（伴随输入+独立音频）": "支持",
+            "权限管理": "支持",
+            "IPC解码（ONVIF RTSP GB28181）": "支持",
+            "输入源备份": "支持",
+            "设备备份": "支持",
+            "图层数量2K": "每张输出板卡10图层",
+            "预监/回显支持(需选配预监卡)": "支持",
+            "HDR、3D": "支持",
+            "电源备份": "2+2",
+            "新功能": "1、新增H_2路DP1.2输入卡；2、新增H_4路光口发送卡（增强版）；3、新增H_1路DP1.4+1路HDMI2.1输入卡；4、新增H_4路光口输入卡；\n5、新增多屏管理、预监轮巡、预监画质提升等功能；6、双4K输入子卡全系机箱适配；\n7、触控液晶新增：锁屏/熄屏/屏幕控制/屏幕列表/屏幕亮度调节/场景切换/3D左右眼切换/OSD开关/控制指令功能；8、硬件亮度定时调节；9、HDBaset/NDI/OPT/ST2110视频信号远传；",
+            "可选输入子卡": "H_2路DP1.2输入卡、H_1路DP1.4+1路HDMI 2.1输入卡、H_4路光口输入卡、H_4路 DVI输入卡、H_4路 HDMI输入卡、H_1路HDMI 2.0+1路DP1.2输入卡、\nH_1 路 HDMI 2.0 输入卡、H_1 路 DP1.2 输入卡、H_2 路 HDMI 2.0 输入卡H_2 路 HDMI 2.0 +2路DP1.2输入卡、H_2 路网口IP解码卡、H_4 路3G-SDI输入卡、H_1路12G-SDI输入卡、\nH_2路CVBS+2路 VGA 输入卡、H_2 路 DP1.1 输入卡、H_4 路VGA输入卡 、H_标准中控子卡、H_4路HDBaseT输入卡（HDBaseT×4)、H_1路NDI 输入卡、H_1路ST2110输入卡、\nH_2路光口输入卡、H_2×Audio 输入+2×Audio输出卡（音频输入×2、音频输出×2）",
+            "可选输出子卡": "H_4路 DVI输出卡、H_4路 HDMI输出卡、H_4路3G-SDI输出卡、H_1路12G-SDI输出卡、H_1路HDMI 2.0输出卡、\nH_4路HDBaseT输出卡（HDBaseT×4)、H_16路网口+2路光口发送卡、H_4路光口发送卡\nH_4路光口发送卡（增强版﹚、H_20路网口发送卡、H_2路网口+1路HDMI 1.3预监卡"
+          }
+        ]
+      }
+    },
+    "400网口": {
+      "name": "400网口定制方案",
+      "description": "适用于定制化超大型屏幕，400个网口输出",
+      "criteria": "屏幕总点数 ≤ 260,000,000 且 单屏网线数量 ≤ 400",
+      "categories": {
+        "视频处理器": [
+          {
+            "型号": "H20",
+            "输入最大的路数": "160",
+            "输出最大路数(视频输出卡)": "80",
+            "输出最大LED带载点数(网口输出卡)": "2.6亿(400个网口)",
+            "输出最大LED带载点数(4光口输出卡对接光电转换器）": "5.2亿（800个网口）",
+            "单卡双4K输入": "支持",
+            "音频（伴随输入+独立音频）": "支持",
+            "权限管理": "支持",
+            "IPC解码（ONVIF RTSP GB28181）": "支持",
+            "输入源备份": "支持",
+            "设备备份": "支持",
+            "图层数量2K": "每张输出板卡16图层",
+            "预监/回显支持(需选配预监卡)": "支持",
+            "HDR、3D": "支持",
+            "电源备份": "3+1",
+            "新功能": "1、新增H_2路DP1.2输入卡；2、新增H_4路光口发送卡（增强版）；3、新增H_1路DP1.4+1路HDMI2.1输入卡；4、新增H_4路光口输入卡；\n5、新增多屏管理、预监轮巡、预监画质提升等功能；6、双4K输入子卡全系机箱适配；\n7、触控液晶新增：锁屏/熄屏/屏幕控制/屏幕列表/屏幕亮度调节/场景切换/3D左右眼切换/OSD开关/控制指令功能；8、硬件亮度定时调节；9、HDBaset/NDI/OPT/ST2110视频信号远传；",
+            "可选输入子卡": "H_2路DP1.2输入卡、H_1路DP1.4+1路HDMI 2.1输入卡、H_4路光口输入卡、H_4路 DVI输入卡、H_4路 HDMI输入卡、H_1路HDMI 2.0+1路DP1.2输入卡、\nH_1 路 HDMI 2.0 输入卡、H_1 路 DP1.2 输入卡、H_2 路 HDMI 2.0 输入卡H_2 路 HDMI 2.0 +2路DP1.2输入卡、H_2 路网口IP解码卡、H_4 路3G-SDI输入卡、H_1路12G-SDI输入卡、\nH_2路CVBS+2路 VGA 输入卡、H_2 路 DP1.1 输入卡、H_4 路VGA输入卡 、H_标准中控子卡、H_4路HDBaseT输入卡（HDBaseT×4)、H_1路NDI 输入卡、H_1路ST2110输入卡、\nH_2路光口输入卡、H_2×Audio 输入+2×Audio输出卡（音频输入×2、音频输出×2）",
+            "可选输出子卡": "H_4路 DVI输出卡、H_4路 HDMI输出卡、H_4路3G-SDI输出卡、H_1路12G-SDI输出卡、H_1路HDMI 2.0输出卡、\nH_4路HDBaseT输出卡（HDBaseT×4)、H_16路网口+2路光口发送卡、H_4路光口发送卡\nH_4路光口发送卡（增强版﹚、H_20路网口发送卡、H_2路网口+1路HDMI 1.3预监卡"
+          }
+        ]
+      }
+    }
+  },
+  "metadata": {
+    "total_levels": 11,
+    "total_devices": 43,          
+                "note": "完整参数版，包含所有设备详细参数，未简化任何信息"
+            }
+        };
+
+        // 严格按照要求实现的核心计算逻辑
+        function calculate() {
+            // 获取输入值
+            const panelWidth = parseFloat(document.getElementById('panelWidth').value) || 0;
+            const panelHeight = parseFloat(document.getElementById('panelHeight').value) || 0;
+            const panelWidthPoints = parseFloat(document.getElementById('panelWidthPoints').value) || 0;
+            const panelHeightPoints = parseFloat(document.getElementById('panelHeightPoints').value) || 0;
+            const screenWidth = parseFloat(document.getElementById('screenWidth').value) || 0;
+            const screenHeight = parseFloat(document.getElementById('screenHeight').value) || 0;
+            const scan = parseFloat(document.getElementById('scan').value) || 1;
+            // 使用统一的箱体参数（只有一个箱体宽度和一个箱体高度）
+            const cabinetWidth = parseFloat(document.getElementById('cabinetWidth').value) || 0;
+            const cabinetHeight = parseFloat(document.getElementById('cabinetHeight').value) || 0;
+            
+            // 验证输入值
+            if (panelWidth <= 0 || panelHeight <= 0 || panelWidthPoints <= 0 || panelHeightPoints <= 0 || 
+                screenWidth <= 0 || screenHeight <= 0 || scan <= 0 || 
+                cabinetWidth <= 0 || cabinetHeight <= 0) {
+                alert('请确保所有输入值都大于0');
+                return;
+            }
+            
+            // 2. 核心计算逻辑 - 完全按照要求实现
+            
+            // 宽/高灯板数量 (向上取整)
+            const boardW = Math.ceil(screenWidth / panelWidth);
+            const boardH = Math.ceil(screenHeight / panelHeight);
+            
+            // 灯板总数
+            const totalBoard = boardW * boardH;
+            
+            // 屏幕宽/高点数
+            const screenWpx = boardW * panelWidthPoints;
+            const screenHpx = boardH * panelHeightPoints;
+            
+            // 屏幕总点数 (根据Excel推导的公式: ceil(widthPx/16)*16*boardW*heightPx*boardH)
+            const totalPx = Math.ceil(panelWidthPoints / 16) * 16 * boardW * panelHeightPoints * boardH;
+            
+            // 单张模组IC数量 (根据新公式)
+            const icPerBoard = Math.ceil(panelWidthPoints / 16) * Math.ceil(panelHeightPoints / scan) * 3;
+            
+            // 单屏网线数量 (根据新公式)
+            // 使用统一的cabinetWidth和cabinetHeight
+            const netLine = Math.ceil(
+                Math.ceil(totalPx / panelWidthPoints / panelHeightPoints / cabinetWidth * panelWidth / cabinetHeight * panelHeight) / 
+                Math.floor(650000 / cabinetWidth * panelWidth / panelWidthPoints / cabinetHeight * panelHeight / panelHeightPoints)
+            );
+            
+            // 平米模组个数
+            const boardsPerM2 = 1000000 / (panelWidth * panelHeight);
+            
+            // 平米IC个数
+            const icPerM2 = boardsPerM2 * icPerBoard;
+            
+            // 整屏驱动IC总个数
+            const totalIC = icPerBoard * totalBoard;
+
+            // 新增：计算箱体数量 (向上取整)
+            // 使用统一的cabinetWidth和cabinetHeight作为有效箱体尺寸
+            const cabinetW = Math.ceil(screenWidth / cabinetWidth);
+            const cabinetH = Math.ceil(screenHeight / cabinetHeight);
+            const totalCabinet = cabinetW * cabinetH;
+            
+            // 计算点间距
+            const pitchWidth = panelWidth / panelWidthPoints;
+            const pitchHeight = panelHeight / panelHeightPoints;
+            
+            // 更新结果显示
+            document.getElementById('widthPanelCount').textContent = boardW;
+            document.getElementById('heightPanelCount').textContent = boardH;
+            document.getElementById('totalPanelCount').textContent = totalBoard;
+            document.getElementById('screenWidthPoints').textContent = screenWpx.toLocaleString();
+            document.getElementById('screenHeightPoints').textContent = screenHpx.toLocaleString();
+            document.getElementById('totalPoints').textContent = totalPx.toLocaleString();
+            document.getElementById('networkCables').textContent = netLine;
+            document.getElementById('modulesPerSquare').textContent = boardsPerM2.toFixed(2);
+            document.getElementById('icPerModule').textContent = icPerBoard.toFixed(0);
+            document.getElementById('icPerSquare').textContent = icPerM2.toFixed(0);
+            document.getElementById('totalICCount').textContent = totalIC.toLocaleString();
+            document.getElementById('widthBoxCount').textContent = cabinetW;
+            document.getElementById('heightBoxCount').textContent = cabinetH;
+            document.getElementById('totalBoxCount').textContent = totalCabinet;
+            
+            // 更新点间距显示
+            const pitchSpacingElement = document.getElementById('pitchSpacing');
+            if (Math.abs(pitchWidth - pitchHeight) < 0.000001) { // 相等的情况
+                pitchSpacingElement.textContent = pitchWidth.toFixed(2);
+            } else { // 不相等的情况
+                pitchSpacingElement.innerHTML = `
+                    <div class="pitch-spacing-container">
+                        <div class="pitch-half"><strong>宽:</strong> ${pitchWidth.toFixed(2)}</div>
+                        <div class="pitch-half"><strong>高:</strong> ${pitchHeight.toFixed(2)}</div>
+                    </div>
+                `;
+            }
+            
+            // 显示设备推荐区域
+            document.getElementById('recommendationSection').style.display = 'block';
+            
+            // 获取推荐设备
+            getRecommendedDevices(totalPx, netLine);
+        }
+
+        // 严格按照用户的11条规则确定档位 - 修复档位调用逻辑
+        function determineLevel(screenPoints, networkCables) {
+            // 1. 屏幕总点数小于1300000而且单屏数量网线数量小于等于2时，调用1-2网口，如果有其中一项参数大于要求，则调用4-6网口。
+            if (screenPoints < 1300000 && networkCables <= 2) {
+                return "1-2网口";
+            }
+            // 2. 屏幕总点数小于3900000而且单屏数量网线数量小于等于6时，调用4-6网口，如果有其中一项参数大于要求，则调用8-12网口。
+            else if (screenPoints < 3900000 && networkCables <= 6) {
+                return "4-6网口";
+            }
+            // 3. 屏幕总点数小于7800000而且单屏数量网线数量小于等于12时，调用8-12网口，如果有其中一项参数大于要求，则调用16-20网口。
+            else if (screenPoints < 7800000 && networkCables <= 12) {
+                return "8-12网口";
+            }
+            // 4. 屏幕总点数小于13000000而且单屏数量网线数量小于等于20时，调用16-20，如果有其中一项参数大于要求，则调用24网口。
+            else if (screenPoints < 13000000 && networkCables <= 20) {
+                return "16-20网口";
+            }
+            // 5. 屏幕总点数小于15600000而且单屏数量网线数量小于等于24时，调用24网口，如果有其中一项参数大于要求，则调用24网口。
+            else if (screenPoints < 15600000 && networkCables <= 24) {
+                return "24网口";
+            }
+            // 6. 屏幕总点数小于20800000而且单屏数量网线数量小于等于32时，调用32网口，如果有其中一项参数大于要求，则调用40网口。
+            else if (screenPoints < 20800000 && networkCables <= 32) {
+                return "32网口";
+            }
+            // 7. 屏幕总点数小于26000000而且单屏数量网线数量小于等于40时，调用40，如果有其中一项参数大于要求，则调用60网口。
+            else if (screenPoints < 26000000 && networkCables <= 40) {
+                return "40网口";
+            }
+            // 8. 屏幕总点数小于39000000而且单屏数量网线数量小于等于60时，调用60网口，如果有其中一项参数大于要求，则调用100网口。
+            else if (screenPoints < 39000000 && networkCables <= 60) {
+                return "60网口";
+            }
+            // 9. 屏幕总点数小于65000000而且单屏数量网线数量小于等于100时，调用100网口，如果有其中一项参数大于要求，则调用200网口。
+            else if (screenPoints < 65000000 && networkCables <= 100) {
+                return "100网口";
+            }
+            // 10. 屏幕总点数小于130000000而且单屏数量网线数量小于等于200时，调用200网口，如果有其中一项参数大于要求，则调用400网口。
+            else if (screenPoints < 130000000 && networkCables <= 200) {
+                return "200网口";
+            }
+            // 11. 屏幕总点数小于260000000而且单屏数量网线数量小于等于400时，调用400网口，如果有其中一项参数大于要求，则显示：屏幕过大
+            else if (screenPoints < 260000000 && networkCables <= 400) {
+                return "400网口";
+            }
+            else {
+                return "error"; // 屏幕过大
+            }
+        }
+
+        // 获取推荐设备
+        function getRecommendedDevices(screenPoints, networkCables) {
+            const level = determineLevel(screenPoints, networkCables);
+            const devicesContainer = document.getElementById('devicesContainer');
+            
+            if (level === "error") {
+                devicesContainer.innerHTML = `
+                    <div class="error">
+                        <h3>⚠️ 屏幕过大警告</h3>
+                        <p>超出系统计算范围，请联系工程师人工计算！</p>
+                        <p><strong>屏幕总点数:</strong> ${screenPoints.toLocaleString()} &gt; 260,000,000</p>
+                        <p><strong>单屏网线数量:</strong> ${networkCables} &gt; 400</p>
+                    </div>
+                `;
+                document.getElementById('levelName').textContent = "屏幕过大警告";
+                document.getElementById('levelDescription').textContent = "超出系统计算范围";
+                document.getElementById('levelCriteria').textContent = "需要工程师人工计算";
+                return;
+            }
+            
+            const levelData = deviceRecommendations.levels[level];
+            if (!levelData) {
+                devicesContainer.innerHTML = `
+                    <div class="error">
+                        <h3>❌ 未找到对应的设备档位</h3>
+                        <p>档位: ${level}</p>
+                        <p>屏幕总点数: ${screenPoints.toLocaleString()}</p>
+                        <p>单屏网线数量: ${networkCables}</p>
+                        <p>可能原因: 当前数据只包含1-2网口和4-6网口档位，其他档位需要扩展数据库</p>
+                    </div>
+                `;
+                document.getElementById('levelName').textContent = "未找到档位";
+                document.getElementById('levelDescription').textContent = `当前档位: ${level}`;
+                document.getElementById('levelCriteria').textContent = "请检查输入参数或扩展设备数据库";
+                return;
+            }
+            
+            // 更新档位信息
+            document.getElementById('levelName').textContent = levelData.name;
+            document.getElementById('levelDescription').textContent = levelData.description;
+            document.getElementById('levelCriteria').textContent = `档位判断条件: ${levelData.criteria}`;
+            
+            // 生成设备推荐HTML
+            let html = '';
+            
+            // 按设备类别分组显示
+            for (const [categoryName, devices] of Object.entries(levelData.categories)) {
+                html += `
+                    <div class="device-category">
+                        <div class="category-title">${categoryName}</div>
+                `;
+                
+                devices.forEach((device, index) => {
+                    const deviceName = device.型号 || device.产品名称 || `设备 ${index + 1}`;
+                    html += `
+                        <div class="device-item">
+                            <div class="device-name">${deviceName}</div>
+                            <div class="device-params">
+                    `;
+                    
+                    // 遍历设备的所有参数
+                    for (const [paramName, paramValue] of Object.entries(device)) {
+                        // 跳过型号和产品名称，因为已经在标题显示
+                        if (paramName === '型号' || paramName === '产品名称') continue;
+                        
+                        html += `
+                            <div class="param-item">
+                                <span class="param-label">${paramName}:</span>
+                                <span class="param-value">${paramValue}</span>
+                            </div>
+                        `;
+                    }
+                    
+                    html += `
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                html += `
+                    </div>
+                `;
+            }
+            
+            devicesContainer.innerHTML = html;
+        }
+
+        // 导出到Excel功能
+        function exportToExcel() {
+            // 创建工作簿对象
+            const wb = XLSX.utils.book_new();
+            
+            // 1. 创建输入参数工作表
+            const inputSheetData = [
+                ['参数', '值'],
+                ['灯板宽度 (mm)', document.getElementById('panelWidth').value || '-'],
+                ['灯板高度 (mm)', document.getElementById('panelHeight').value || '-'],
+                ['灯板宽度点数', document.getElementById('panelWidthPoints').value || '-'],
+                ['灯板高度点数', document.getElementById('panelHeightPoints').value || '-'],
+                ['屏幕宽尺寸 (mm)', document.getElementById('screenWidth').value || '-'],
+                ['屏幕高尺寸 (mm)', document.getElementById('screenHeight').value || '-'],
+                ['扫数', document.getElementById('scan').value || '-'],
+                ['箱体宽度 (mm)', document.getElementById('cabinetWidth').value || '-'],
+                ['箱体高度 (mm)', document.getElementById('cabinetHeight').value || '-']
+            ];
+            const inputWS = XLSX.utils.aoa_to_sheet(inputSheetData);
+            XLSX.utils.book_append_sheet(wb, inputWS, '输入参数');
+            
+            // 2. 创建输出结果工作表
+            const outputSheetData = [
+                ['计算项目', '结果'],
+                ['宽灯板数量', document.getElementById('widthPanelCount').textContent],
+                ['高灯板数量', document.getElementById('heightPanelCount').textContent],
+                ['灯板总数', document.getElementById('totalPanelCount').textContent],
+                ['屏幕宽点数 (px)', document.getElementById('screenWidthPoints').textContent],
+                ['屏幕高点数 (px)', document.getElementById('screenHeightPoints').textContent],
+                ['屏幕总点数', document.getElementById('totalPoints').textContent],
+                ['单屏网线数量', document.getElementById('networkCables').textContent],
+                ['平米模组个数', document.getElementById('modulesPerSquare').textContent],
+                ['单张模组IC数量', document.getElementById('icPerModule').textContent],
+                ['平米IC个数', document.getElementById('icPerSquare').textContent],
+                ['整屏驱动IC总个数', document.getElementById('totalICCount').textContent],
+                ['宽箱体数量', document.getElementById('widthBoxCount').textContent],
+                ['高箱体数量', document.getElementById('heightBoxCount').textContent],
+                ['箱体总数', document.getElementById('totalBoxCount').textContent],
+                ['点间距 (mm)', document.getElementById('pitchSpacing').textContent]
+            ];
+            const outputWS = XLSX.utils.aoa_to_sheet(outputSheetData);
+            XLSX.utils.book_append_sheet(wb, outputWS, '输出结果');
+            
+            // 3. 创建设备推荐工作表
+            const levelName = document.getElementById('levelName').textContent;
+            const levelDescription = document.getElementById('levelDescription').textContent;
+            const levelCriteria = document.getElementById('levelCriteria').textContent;
+            
+            // 获取设备推荐区域的数据
+            const devicesContainer = document.getElementById('devicesContainer');
+            const deviceSheetsData = [];
+            
+            deviceSheetsData.push(['设备推荐信息']);
+            deviceSheetsData.push(['档位名称', levelName]);
+            deviceSheetsData.push(['描述', levelDescription]);
+            deviceSheetsData.push(['判断条件', levelCriteria]);
+            deviceSheetsData.push([]);
+            
+            // 获取设备信息
+            const deviceCategories = devicesContainer.querySelectorAll('.device-category');
+            deviceCategories.forEach(category => {
+                const categoryName = category.querySelector('.category-title').textContent;
+                deviceSheetsData.push([`设备类别: ${categoryName}`]);
+                
+                const devices = category.querySelectorAll('.device-item');
+                devices.forEach(device => {
+                    const deviceName = device.querySelector('.device-name').textContent;
+                    deviceSheetsData.push(['设备型号', deviceName]);
+                    
+                    const params = device.querySelectorAll('.param-item');
+                    params.forEach(param => {
+                        const paramName = param.querySelector('.param-label').textContent.replace(':', '');
+                        const paramValue = param.querySelector('.param-value').textContent;
+                        deviceSheetsData.push([paramName, paramValue]);
+                    });
+                    
+                    deviceSheetsData.push([]); // 空行分隔不同设备
+                });
+            });
+            
+            const deviceWS = XLSX.utils.aoa_to_sheet(deviceSheetsData);
+            XLSX.utils.book_append_sheet(wb, deviceWS, '设备推荐');
+            
+            // 4. 保存Excel文件
+            XLSX.writeFile(wb, 'LED屏幕参数计算结果.xlsx');
+        }
+
+        // 打印推荐
+        function printRecommendation() {
+            window.print();
+        }
+
+        // 页面加载完成时的初始化
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('LED屏幕参数计算工具 - 完整参数版 已加载');
+            console.log('设备数据库包含', deviceRecommendations.metadata.total_levels, '个档位，', 
+                        deviceRecommendations.metadata.total_devices, '个设备型号');
+            console.log('✅ 箱体输入窗口已整合：只有一个箱体宽度和一个箱体高度输入框');
+            console.log('✅ 设备档位调用逻辑已严格按照11条规则修复');
+            
+            // 动态加载SheetJS库
+            const script = document.createElement('script');
+            script.src = 'https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js';
+            script.onload = function() {
+                console.log('✅ SheetJS库已加载，Excel导出功能可用');
+            };
+            document.head.appendChild(script);
+        });
+    </script>
+</body>
+</html>
